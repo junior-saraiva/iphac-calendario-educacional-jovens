@@ -8,6 +8,7 @@ import { Layout } from "./components/Layout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import { Alunos } from "./pages/Alunos";
 
 const queryClient = new QueryClient();
 
@@ -40,7 +41,8 @@ const App = () => (
               </ProtectedRoute>
             }>
               <Route index element={<Index />} />
-              {/* Rotas protegidas serão adicionadas aqui */}
+              <Route path="alunos" element={<Alunos />} />
+              {/* Outras rotas protegidas serão adicionadas aqui */}
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

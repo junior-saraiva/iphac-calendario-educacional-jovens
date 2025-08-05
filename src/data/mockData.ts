@@ -68,7 +68,7 @@ export const mockAlunos: Aluno[] = [
     empresa_id: '1',
     curso: 'Jovem Aprendiz - Informática',
     turno: 'Manhã',
-    dia_aula_semana: 3 // Quarta-feira
+    dia_aula_semana: 'Quarta' // Quarta-feira
   },
   {
     id: '2',
@@ -79,7 +79,7 @@ export const mockAlunos: Aluno[] = [
     empresa_id: '2',
     curso: 'Jovem Aprendiz - Informática',
     turno: 'Tarde',
-    dia_aula_semana: 2 // Terça-feira
+    dia_aula_semana: 'Terça' // Terça-feira
   },
   {
     id: '3',
@@ -90,7 +90,7 @@ export const mockAlunos: Aluno[] = [
     empresa_id: '3',
     curso: 'Jovem Aprendiz - Administração',
     turno: 'Manhã',
-    dia_aula_semana: 4 // Quinta-feira
+    dia_aula_semana: 'Quinta' // Quinta-feira
   },
 ];
 

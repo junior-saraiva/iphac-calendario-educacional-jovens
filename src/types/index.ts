@@ -39,7 +39,7 @@ export interface Aluno {
   empresa_id: string;
   curso: string;
   turno: string;
-  dia_aula_semana: number; // 0-6 (domingo-sabado)
+  dia_aula_semana: string; // Segunda, Terça, Quarta, Quinta, Sexta
 }
 
 export interface Feriado {
