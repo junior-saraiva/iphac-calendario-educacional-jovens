@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import { Alunos } from "./pages/Alunos";
 import { Calendario } from "./pages/Calendario";
 import { Feriados } from "./pages/Feriados";
+import { Trilhas } from "./pages/Trilhas";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
             }>
               <Route index element={<Index />} />
               <Route path="alunos" element={<Alunos />} />
+              <Route path="trilhas" element={<Trilhas />} />
               <Route path="feriados" element={<Feriados />} />
               <Route path="calendario" element={<Calendario />} />
               {/* Outras rotas protegidas serão adicionadas aqui */}

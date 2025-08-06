@@ -1,17 +1,25 @@
-import { Aluno, CalendarioGerado, CalendarioEvento, Feriado, ResumoTrilha } from '@/types';
-import { mockTrilhas } from '@/data/mockData';
+import { Aluno, CalendarioGerado, CalendarioEvento, Feriado, ResumoTrilha, Trilha } from '@/types';
 import { addDays, format, isSameDay, isWeekend, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export class CalendarioGenerator {
   private static feriados: Feriado[] = [];
+  private static trilhas: Trilha[] = [];
 
   static setFeriados(feriados: Feriado[]) {
     this.feriados = feriados;
   }
 
+  static setTrilhas(trilhas: Trilha[]) {
+    this.trilhas = trilhas;
+  }
+
   static getFeriados(): Feriado[] {
     return this.feriados;
+  }
+
+  static getTrilhas(): Trilha[] {
+    return this.trilhas;
   }
 
   static gerarCalendario(
@@ -218,7 +226,7 @@ export class CalendarioGenerator {
   }
 
   private static gerarResumoTrilhas(aluno: Aluno, dataInicio: Date, eventos: CalendarioEvento[]): ResumoTrilha[] {
-    const trilhasAluno = mockTrilhas.filter(t => t.turma_id === aluno.turma_id);
+    const trilhasAluno = this.trilhas.filter(t => t.turma_id === aluno.turma_id);
     const resumo: ResumoTrilha[] = [];
 
     // Módulo 1 - Integração
