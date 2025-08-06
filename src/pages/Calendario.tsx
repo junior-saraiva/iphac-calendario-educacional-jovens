@@ -9,6 +9,7 @@ import { CalendarioGenerator } from '@/lib/calendarioGenerator';
 import { Search, Calendar as CalendarIcon, Users } from 'lucide-react';
 import { mockAlunos, mockEmpresas, mockTurmas, mockPolos } from '@/data/mockData';
 import { useToast } from '@/hooks/use-toast';
+import { useFeriados } from '@/hooks/useFeriados';
 import { Aluno, CalendarioGerado } from '@/types';
 
 export function Calendario() {
@@ -19,6 +20,7 @@ export function Calendario() {
   const [calendarioGerado, setCalendarioGerado] = useState<CalendarioGerado | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const { feriados } = useFeriados();
 
   const normalizeString = (str: string) => {
     return str
@@ -55,6 +57,9 @@ export function Calendario() {
       const dataFim = new Date(dataInicio);
       dataFim.setFullYear(dataFim.getFullYear() + 1); // 1 ano de contrato
 
+      // Atualizar feriados no gerador antes de gerar o calendário
+      CalendarioGenerator.setFeriados(feriados);
+
       const calendario = CalendarioGenerator.gerarCalendario(
         selectedAluno,
         new Date(dataInicio),
@@ -65,7 +70,7 @@ export function Calendario() {
       setCalendarioGerado(calendario);
       toast({
         title: "Calendário gerado com sucesso!",
-        description: `Calendário criado para ${selectedAluno.nome}`
+        description: `Calendário criado para ${selectedAluno.nome} com ${feriados.length} feriados considerados`
       });
     } catch (error) {
       toast({

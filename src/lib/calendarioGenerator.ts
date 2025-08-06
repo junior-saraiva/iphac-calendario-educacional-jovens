@@ -1,10 +1,18 @@
 import { Aluno, CalendarioGerado, CalendarioEvento, Feriado, ResumoTrilha } from '@/types';
-import { mockFeriados, mockTrilhas } from '@/data/mockData';
+import { mockTrilhas } from '@/data/mockData';
 import { addDays, format, isSameDay, isWeekend, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export class CalendarioGenerator {
-  private static feriados: Feriado[] = mockFeriados;
+  private static feriados: Feriado[] = [];
+
+  static setFeriados(feriados: Feriado[]) {
+    this.feriados = feriados;
+  }
+
+  static getFeriados(): Feriado[] {
+    return this.feriados;
+  }
 
   static gerarCalendario(
     aluno: Aluno,
