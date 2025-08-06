@@ -18,6 +18,32 @@
   - No momento do cadastro do aluno, deve ser definido qual dia da semana será utilizado para as aulas teóricas.
   - Esse dia será usado automaticamente para gerar todas as sessões teóricas do contrato (exceto quando houver feriado, quando a aula é suprimida ou compensada).
 
+Sem aulas aos sábados e domingos
+A geração de calendário deve excluir automaticamente finais de semana, tanto para aulas teóricas quanto práticas.
+
+Respeito à data de início
+O calendário deve iniciar exatamente na data informada pelo operador, mesmo que isso caia num final de semana (neste caso, o sistema apenas ignora o final de semana e segue a sequência a partir do primeiro dia útil seguinte).
+
+Cadastro de Polos/Unidades
+Criar um módulo de cadastro completo de polos com os seguintes campos:
+
+Nome, CNPJ, endereço, cidade, UF, telefone
+
+Responsável pelo polo (nome + e-mail)
+
+Logomarca (upload)
+
+Vinculação com aluno e geração de cabeçalho no PDF
+
+Aprimoramento do PDF
+
+A legenda (aula teórica, prática, feriado, férias) deve ser exibida no topo.
+
+O resumo das trilhas com datas de início, fim e carga horária deve vir logo abaixo da legenda.
+
+O cabeçalho do calendário deve trazer os dados completos da unidade e da empresa vinculada.
+
+
 ---
 
 ### ✨ Elevator Pitch
