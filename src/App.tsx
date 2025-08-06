@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { Alunos } from "./pages/Alunos";
+import { Calendario } from "./pages/Calendario";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
             }>
               <Route index element={<Index />} />
               <Route path="alunos" element={<Alunos />} />
+              <Route path="calendario" element={<Calendario />} />
               {/* Outras rotas protegidas serão adicionadas aqui */}
             </Route>
             <Route path="*" element={<NotFound />} />
