@@ -7,6 +7,8 @@ import { ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { PDFGenerator } from '@/lib/pdfGenerator';
+import { useToast } from '@/hooks/use-toast';
 
 interface CalendarioVisualizerProps {
   calendario: CalendarioGerado;
@@ -14,6 +16,8 @@ interface CalendarioVisualizerProps {
 
 export function CalendarioVisualizer({ calendario }: CalendarioVisualizerProps) {
   const [mesAtual, setMesAtual] = useState(new Date(calendario.data_inicio));
+  const [gerandoPDF, setGerandoPDF] = useState(false);
+  const { toast } = useToast();
 
   const inicioMes = startOfMonth(mesAtual);
   const fimMes = endOfMonth(mesAtual);
@@ -37,6 +41,26 @@ export function CalendarioVisualizer({ calendario }: CalendarioVisualizerProps) 
   const proximoMes = () => setMesAtual(addMonths(mesAtual, 1));
   const mesAnterior = () => setMesAtual(subMonths(mesAtual, 1));
 
+  const handleGerarPDF = async () => {
+    try {
+      setGerandoPDF(true);
+      await PDFGenerator.gerarPDF(calendario, calendario.aluno.nome);
+      toast({
+        title: "PDF gerado com sucesso!",
+        description: "O calendário foi baixado para seu dispositivo.",
+      });
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast({
+        title: "Erro ao gerar PDF",
+        description: "Ocorreu um erro ao gerar o calendário em PDF. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setGerandoPDF(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header do Calendário */}
@@ -57,9 +81,14 @@ export function CalendarioVisualizer({ calendario }: CalendarioVisualizerProps) 
           <Button variant="outline" size="sm" onClick={proximoMes}>
             <ChevronRight className="h-4 w-4" />
           </Button>
-          <Button variant="default" size="sm">
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={handleGerarPDF}
+            disabled={gerandoPDF}
+          >
             <Download className="h-4 w-4 mr-2" />
-            Gerar PDF
+            {gerandoPDF ? 'Gerando...' : 'Gerar PDF'}
           </Button>
         </div>
       </div>
