@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -17,7 +17,7 @@ interface NotificationProps {
 export function Notification({ type, title, message, onClose, autoClose = true, duration = 5000 }: NotificationProps) {
   const [isVisible, setIsVisible] = useState(true);
 
-  useState(() => {
+  useEffect(() => {
     if (autoClose) {
       const timer = setTimeout(() => {
         setIsVisible(false);
@@ -25,7 +25,7 @@ export function Notification({ type, title, message, onClose, autoClose = true, 
       }, duration);
       return () => clearTimeout(timer);
     }
-  });
+  }, [autoClose, duration, onClose]);
 
   if (!isVisible) return null;
 
@@ -137,7 +137,7 @@ interface ValidationFeedbackProps {
 export function ValidationFeedback({ field, value, rules }: ValidationFeedbackProps) {
   const [errors, setErrors] = useState<string[]>([]);
 
-  useState(() => {
+  useEffect(() => {
     const newErrors: string[] = [];
 
     if (rules.required && (!value || value.toString().trim() === '')) {
@@ -164,7 +164,7 @@ export function ValidationFeedback({ field, value, rules }: ValidationFeedbackPr
     }
 
     setErrors(newErrors);
-  });
+  }, [field, value, rules]);
 
   if (errors.length === 0) return null;
 
