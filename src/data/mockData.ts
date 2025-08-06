@@ -68,18 +68,18 @@ export const mockAlunos: Aluno[] = [
     empresa_id: '1',
     curso: 'Jovem Aprendiz - Informática',
     turno: 'Manhã',
-    dia_aula_semana: 'Quarta' // Quarta-feira
+    dia_aula_semana: 'Quarta'
   },
   {
     id: '2',
-    nome: 'Maria Oliveira Costa',
+    nome: 'María Oliveira Costa',
     cpf: '987.654.321-00',
     matricula: 'MAT002',
     turma_id: '1',
     empresa_id: '2',
     curso: 'Jovem Aprendiz - Informática',
     turno: 'Tarde',
-    dia_aula_semana: 'Terça' // Terça-feira
+    dia_aula_semana: 'Terça'
   },
   {
     id: '3',
@@ -90,8 +90,41 @@ export const mockAlunos: Aluno[] = [
     empresa_id: '3',
     curso: 'Jovem Aprendiz - Administração',
     turno: 'Manhã',
-    dia_aula_semana: 'Quinta' // Quinta-feira
+    dia_aula_semana: 'Quinta'
   },
+  {
+    id: '4',
+    nome: 'José da Silva',
+    cpf: '789.123.456-00',
+    matricula: 'MAT004',
+    turma_id: '2',
+    empresa_id: '1',
+    curso: 'Jovem Aprendiz - Administração',
+    turno: 'Tarde',
+    dia_aula_semana: 'Segunda'
+  },
+  {
+    id: '5',
+    nome: 'Ana Luíza',
+    cpf: '321.654.987-00',
+    matricula: 'MAT005',
+    turma_id: '1',
+    empresa_id: '2',
+    curso: 'Jovem Aprendiz - Informática',
+    turno: 'Manhã',
+    dia_aula_semana: 'Sexta'
+  },
+  {
+    id: '6',
+    nome: 'André Luís',
+    cpf: '654.987.321-00',
+    matricula: 'MAT006',
+    turma_id: '2',
+    empresa_id: '3',
+    curso: 'Jovem Aprendiz - Administração',
+    turno: 'Tarde',
+    dia_aula_semana: 'Segunda'
+  }
 ];
 
 export const mockFeriados: Feriado[] = [

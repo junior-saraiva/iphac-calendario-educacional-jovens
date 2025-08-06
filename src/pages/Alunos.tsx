@@ -30,11 +30,19 @@ export function Alunos() {
   const [editingAluno, setEditingAluno] = useState<Aluno | null>(null);
   const { toast } = useToast();
 
-  const filteredAlunos = alunos.filter(aluno => 
-    aluno.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    aluno.cpf.includes(searchTerm) ||
-    aluno.matricula.includes(searchTerm)
-  );
+  const normalizeString = (str: string) => {
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  };
+
+  const filteredAlunos = alunos.filter(aluno => {
+    const normalizedSearchTerm = normalizeString(searchTerm);
+    return normalizeString(aluno.nome).includes(normalizedSearchTerm) ||
+           aluno.cpf.includes(searchTerm) ||
+           aluno.matricula.includes(searchTerm);
+  });
 
   const handleCreateAluno = (data: Omit<Aluno, 'id'>) => {
     const newAluno: Aluno = {
@@ -79,7 +87,7 @@ export function Alunos() {
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
-    setEditingAluno(null);
+    setTimeout(() => setEditingAluno(null), 100);
   };
 
   const getTurmaNome = (turmaId: string) => {
@@ -94,9 +102,12 @@ export function Alunos() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-foreground">Alunos</h1>
-        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) setEditingAluno(null);
+        }}>
           <DialogTrigger asChild>
-            <Button onClick={() => setEditingAluno(null)}>
+            <Button>
               <Plus className="mr-2 h-4 w-4" />
               Novo Aluno
             </Button>
