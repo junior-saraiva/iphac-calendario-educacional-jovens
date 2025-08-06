@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CalendarioGerado, CalendarioEvento } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, Printer } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -18,6 +19,7 @@ export function CalendarioVisualizer({ calendario }: CalendarioVisualizerProps) 
   const [mesAtual, setMesAtual] = useState(new Date(calendario.data_inicio));
   const [gerandoPDF, setGerandoPDF] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const inicioMes = startOfMonth(mesAtual);
   const fimMes = endOfMonth(mesAtual);
@@ -61,6 +63,12 @@ export function CalendarioVisualizer({ calendario }: CalendarioVisualizerProps) 
     }
   };
 
+  const handleVisualizarImpressao = () => {
+    navigate('/calendario/impressao', { 
+      state: { calendario } 
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header do Calendário */}
@@ -84,11 +92,19 @@ export function CalendarioVisualizer({ calendario }: CalendarioVisualizerProps) 
           <Button 
             variant="default" 
             size="sm" 
+            onClick={handleVisualizarImpressao}
+          >
+            <Printer className="h-4 w-4 mr-2" />
+            Visualizar Impressão
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
             onClick={handleGerarPDF}
             disabled={gerandoPDF}
           >
             <Download className="h-4 w-4 mr-2" />
-            {gerandoPDF ? 'Gerando...' : 'Gerar PDF'}
+            {gerandoPDF ? 'Gerando...' : 'PDF Antigo'}
           </Button>
         </div>
       </div>
