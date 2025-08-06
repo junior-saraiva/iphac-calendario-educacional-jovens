@@ -19,7 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { mockTurmas, mockEmpresas } from '@/data/mockData';
+import { mockTurmas, mockEmpresas, mockPolos } from '@/data/mockData';
 import { Aluno } from '@/types';
 
 // Validação de CPF brasileira
@@ -48,6 +48,7 @@ const alunoSchema = z.object({
   matricula: z.string().min(1, 'Matrícula é obrigatória'),
   turma_id: z.string().min(1, 'Turma é obrigatória'),
   empresa_id: z.string().min(1, 'Empresa é obrigatória'),
+  polo_id: z.string().min(1, 'Polo é obrigatório'),
   curso: z.string().min(1, 'Curso é obrigatório'),
   turno: z.enum(['Manhã', 'Tarde', 'Noite'], {
     required_error: 'Turno é obrigatório',
@@ -74,6 +75,7 @@ export function AlunoForm({ aluno, onSubmit, onCancel }: AlunoFormProps) {
       matricula: aluno.matricula,
       turma_id: aluno.turma_id,
       empresa_id: aluno.empresa_id,
+      polo_id: aluno.polo_id,
       curso: aluno.curso,
       turno: aluno.turno as 'Manhã' | 'Tarde' | 'Noite',
       dia_aula_semana: aluno.dia_aula_semana as 'Segunda' | 'Terça' | 'Quarta' | 'Quinta' | 'Sexta',
@@ -83,6 +85,7 @@ export function AlunoForm({ aluno, onSubmit, onCancel }: AlunoFormProps) {
       matricula: '',
       turma_id: '1',
       empresa_id: '1',
+      polo_id: '1',
       curso: '',
       turno: 'Manhã' as const,
       dia_aula_semana: 'Segunda' as const,
@@ -96,6 +99,7 @@ export function AlunoForm({ aluno, onSubmit, onCancel }: AlunoFormProps) {
       matricula: data.matricula,
       turma_id: data.turma_id,
       empresa_id: data.empresa_id,
+      polo_id: data.polo_id,
       curso: data.curso,
       turno: data.turno,
       dia_aula_semana: data.dia_aula_semana,
@@ -174,7 +178,7 @@ export function AlunoForm({ aluno, onSubmit, onCancel }: AlunoFormProps) {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="turma_id"
@@ -222,6 +226,34 @@ export function AlunoForm({ aluno, onSubmit, onCancel }: AlunoFormProps) {
                     {mockEmpresas.map((empresa) => (
                       <SelectItem key={empresa.id} value={empresa.id}>
                         {empresa.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="polo_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Polo/Unidade</FormLabel>
+                <Select 
+                  onValueChange={field.onChange}
+                  value={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um polo" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {mockPolos.map((polo) => (
+                      <SelectItem key={polo.id} value={polo.id}>
+                        {polo.nome}
                       </SelectItem>
                     ))}
                   </SelectContent>

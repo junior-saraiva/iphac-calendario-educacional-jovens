@@ -1,3 +1,16 @@
+export interface Polo {
+  id: string;
+  nome: string;
+  cnpj: string;
+  endereco: string;
+  cidade: string;
+  uf: string;
+  telefone: string;
+  responsavel_nome: string;
+  responsavel_email: string;
+  logomarca?: string;
+}
+
 export interface Empresa {
   id: string;
   nome: string;
@@ -37,6 +50,7 @@ export interface Aluno {
   matricula: string;
   turma_id: string;
   empresa_id: string;
+  polo_id: string;
   curso: string;
   turno: string;
   dia_aula_semana: string; // Segunda, Terça, Quarta, Quinta, Sexta
@@ -63,6 +77,14 @@ export interface CalendarioEvento {
   disciplina?: string;
 }
 
+export interface ResumoTrilha {
+  nome: string;
+  tipo: string;
+  data_inicio: string;
+  data_fim: string;
+  carga_horaria: number;
+}
+
 export interface CalendarioGerado {
   aluno: Aluno;
   eventos: CalendarioEvento[];
@@ -70,4 +92,5 @@ export interface CalendarioGerado {
   data_fim: string;
   ferias_inicio: string;
   ferias_fim: string;
+  resumo_trilhas: ResumoTrilha[];
 }

@@ -1,4 +1,31 @@
-import { Empresa, Turma, Trilha, Disciplina, Aluno, Feriado } from '../types';
+import { Polo, Empresa, Turma, Trilha, Disciplina, Aluno, Feriado } from '../types';
+
+export const mockPolos: Polo[] = [
+  {
+    id: '1',
+    nome: 'SENAI - Centro de Tecnologia Industrial',
+    cnpj: '03.928.077/0001-59',
+    endereco: 'Rua da Tecnologia, 123 - Centro',
+    cidade: 'São Paulo',
+    uf: 'SP',
+    telefone: '(11) 3456-7890',
+    responsavel_nome: 'Maria Silva Santos',
+    responsavel_email: 'maria.santos@senai.br',
+    logomarca: '/logo-senai.png'
+  },
+  {
+    id: '2',
+    nome: 'SENAC - Unidade Lapa',
+    cnpj: '03.709.814/0001-48',
+    endereco: 'Rua Clélia, 1040 - Lapa',
+    cidade: 'São Paulo',
+    uf: 'SP',
+    telefone: '(11) 2845-6000',
+    responsavel_nome: 'João Carlos Oliveira',
+    responsavel_email: 'joao.oliveira@senac.br',
+    logomarca: '/logo-senac.png'
+  }
+];
 
 export const mockEmpresas: Empresa[] = [
   { id: '1', nome: 'TechCorp LTDA', cnpj: '12.345.678/0001-90', cidade: 'São Paulo', estado: 'SP' },
@@ -66,6 +93,7 @@ export const mockAlunos: Aluno[] = [
     matricula: 'MAT001',
     turma_id: '1',
     empresa_id: '1',
+    polo_id: '1',
     curso: 'Jovem Aprendiz - Informática',
     turno: 'Manhã',
     dia_aula_semana: 'Quarta'
@@ -77,6 +105,7 @@ export const mockAlunos: Aluno[] = [
     matricula: 'MAT002',
     turma_id: '1',
     empresa_id: '2',
+    polo_id: '1',
     curso: 'Jovem Aprendiz - Informática',
     turno: 'Tarde',
     dia_aula_semana: 'Terça'
@@ -88,6 +117,7 @@ export const mockAlunos: Aluno[] = [
     matricula: 'MAT003',
     turma_id: '2',
     empresa_id: '3',
+    polo_id: '2',
     curso: 'Jovem Aprendiz - Administração',
     turno: 'Manhã',
     dia_aula_semana: 'Quinta'
@@ -99,6 +129,7 @@ export const mockAlunos: Aluno[] = [
     matricula: 'MAT004',
     turma_id: '2',
     empresa_id: '1',
+    polo_id: '2',
     curso: 'Jovem Aprendiz - Administração',
     turno: 'Tarde',
     dia_aula_semana: 'Segunda'
@@ -110,6 +141,7 @@ export const mockAlunos: Aluno[] = [
     matricula: 'MAT005',
     turma_id: '1',
     empresa_id: '2',
+    polo_id: '1',
     curso: 'Jovem Aprendiz - Informática',
     turno: 'Manhã',
     dia_aula_semana: 'Sexta'
@@ -121,6 +153,7 @@ export const mockAlunos: Aluno[] = [
     matricula: 'MAT006',
     turma_id: '2',
     empresa_id: '3',
+    polo_id: '2',
     curso: 'Jovem Aprendiz - Administração',
     turno: 'Tarde',
     dia_aula_semana: 'Segunda'

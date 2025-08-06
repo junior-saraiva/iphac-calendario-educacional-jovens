@@ -1,5 +1,5 @@
-import { Aluno, CalendarioGerado, CalendarioEvento, Feriado } from '@/types';
-import { mockFeriados } from '@/data/mockData';
+import { Aluno, CalendarioGerado, CalendarioEvento, Feriado, ResumoTrilha } from '@/types';
+import { mockFeriados, mockTrilhas } from '@/data/mockData';
 import { addDays, format, isSameDay, isWeekend, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -14,12 +14,15 @@ export class CalendarioGenerator {
   ): CalendarioGerado {
     const eventos: CalendarioEvento[] = [];
     
+    // Ajustar data de início se cair em fim de semana
+    const dataInicioAjustada = this.ajustarDataInicio(dataInicio);
+    
     // Gerar férias (30 dias corridos)
     const feriasEventos = this.gerarFerias(feriasInicio);
     eventos.push(...feriasEventos);
 
-    // Gerar módulo 1 (10 dias corridos + extensão por feriados)
-    const modulo1Eventos = this.gerarModulo1(dataInicio, eventos);
+    // Gerar módulo 1 (10 dias úteis - sem fins de semana)
+    const modulo1Eventos = this.gerarModulo1(dataInicioAjustada, eventos);
     eventos.push(...modulo1Eventos);
 
     // Calcular data de início dos demais módulos
@@ -36,8 +39,11 @@ export class CalendarioGenerator {
     eventos.push(...modulosRegularesEventos);
 
     // Adicionar feriados
-    const feriadosEventos = this.adicionarFeriados(dataInicio, dataFim);
+    const feriadosEventos = this.adicionarFeriados(dataInicioAjustada, dataFim);
     eventos.push(...feriadosEventos);
+
+    // Gerar resumo das trilhas
+    const resumoTrilhas = this.gerarResumoTrilhas(aluno, dataInicioAjustada, eventos);
 
     // Ordenar eventos por data
     eventos.sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
@@ -45,10 +51,11 @@ export class CalendarioGenerator {
     return {
       aluno,
       eventos,
-      data_inicio: format(dataInicio, 'yyyy-MM-dd'),
+      data_inicio: format(dataInicioAjustada, 'yyyy-MM-dd'),
       data_fim: format(dataFim, 'yyyy-MM-dd'),
       ferias_inicio: format(feriasInicio, 'yyyy-MM-dd'),
-      ferias_fim: format(addDays(feriasInicio, 29), 'yyyy-MM-dd')
+      ferias_fim: format(addDays(feriasInicio, 29), 'yyyy-MM-dd'),
+      resumo_trilhas: resumoTrilhas
     };
   }
 
@@ -67,6 +74,17 @@ export class CalendarioGenerator {
     return eventos;
   }
 
+  private static ajustarDataInicio(dataInicio: Date): Date {
+    let dataAjustada = new Date(dataInicio);
+    
+    // Se cair no fim de semana, avançar para segunda-feira
+    while (isWeekend(dataAjustada)) {
+      dataAjustada = addDays(dataAjustada, 1);
+    }
+    
+    return dataAjustada;
+  }
+
   private static gerarModulo1(dataInicio: Date, eventosExistentes: CalendarioEvento[]): CalendarioEvento[] {
     const eventos: CalendarioEvento[] = [];
     let diasAdicionados = 0;
@@ -74,6 +92,12 @@ export class CalendarioGenerator {
 
     while (diasAdicionados < 10) {
       const dataStr = format(dataAtual, 'yyyy-MM-dd');
+      
+      // Pular fins de semana
+      if (isWeekend(dataAtual)) {
+        dataAtual = addDays(dataAtual, 1);
+        continue;
+      }
       
       // Verificar se não há conflito com férias ou outros eventos
       const temConflito = eventosExistentes.some(e => e.data === dataStr);
@@ -183,5 +207,39 @@ export class CalendarioGenerator {
 
     const semanaDoAno = Math.floor((data.getTime() - new Date(data.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
     return disciplinas[semanaDoAno % disciplinas.length];
+  }
+
+  private static gerarResumoTrilhas(aluno: Aluno, dataInicio: Date, eventos: CalendarioEvento[]): ResumoTrilha[] {
+    const trilhasAluno = mockTrilhas.filter(t => t.turma_id === aluno.turma_id);
+    const resumo: ResumoTrilha[] = [];
+
+    // Módulo 1 - Integração
+    const eventosModulo1 = eventos.filter(e => e.descricao === 'Módulo 1 - Integração');
+    if (eventosModulo1.length > 0) {
+      resumo.push({
+        nome: 'Módulo 1 - Integração',
+        tipo: 'integracao',
+        data_inicio: eventosModulo1[0].data,
+        data_fim: eventosModulo1[eventosModulo1.length - 1].data,
+        carga_horaria: eventosModulo1.length * 8 // 8 horas por dia
+      });
+    }
+
+    // Demais trilhas
+    trilhasAluno.forEach(trilha => {
+      if (trilha.tipo !== 'integracao') {
+        const cargaHorariaTrilha = trilha.disciplinas.reduce((total, disc) => total + disc.carga_horaria, 0);
+        
+        resumo.push({
+          nome: trilha.nome,
+          tipo: trilha.tipo,
+          data_inicio: format(addDays(dataInicio, 30), 'yyyy-MM-dd'), // Simulação
+          data_fim: format(addDays(dataInicio, 300), 'yyyy-MM-dd'), // Simulação
+          carga_horaria: cargaHorariaTrilha
+        });
+      }
+    });
+
+    return resumo;
   }
 }

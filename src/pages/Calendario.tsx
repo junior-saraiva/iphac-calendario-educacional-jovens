@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CalendarioVisualizer } from '@/components/CalendarioVisualizer';
 import { CalendarioGenerator } from '@/lib/calendarioGenerator';
 import { Search, Calendar as CalendarIcon, Users } from 'lucide-react';
-import { mockAlunos, mockEmpresas, mockTurmas } from '@/data/mockData';
+import { mockAlunos, mockEmpresas, mockTurmas, mockPolos } from '@/data/mockData';
 import { useToast } from '@/hooks/use-toast';
 import { Aluno, CalendarioGerado } from '@/types';
 
@@ -86,6 +86,10 @@ export function Calendario() {
     return mockTurmas.find(t => t.id === turmaId)?.nome || 'Não encontrada';
   };
 
+  const getPoloNome = (poloId: string) => {
+    return mockPolos.find(p => p.id === poloId)?.nome || 'Não encontrado';
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
@@ -93,123 +97,153 @@ export function Calendario() {
         <h1 className="text-3xl font-bold text-foreground">Gerar Calendário</h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Formulário de Geração */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Users className="h-5 w-5" />
-              <span>Dados do Aluno</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="search">Buscar Aluno</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="search"
-                  placeholder="Nome, CPF ou matrícula..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+      {/* Formulário de Geração */}
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Users className="h-5 w-5" />
+            <span>Dados do Aluno</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Busca do Aluno */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="search">Buscar Aluno</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="search"
+                    placeholder="Nome, CPF ou matrícula..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                
+                {searchTerm && filteredAlunos.length > 0 && !selectedAluno && (
+                  <Card className="mt-2">
+                    <CardContent className="p-2 max-h-60 overflow-y-auto">
+                      {filteredAlunos.map((aluno) => (
+                        <div
+                          key={aluno.id}
+                          className="p-3 hover:bg-accent rounded-md cursor-pointer transition-colors"
+                          onClick={() => handleAlunoSelect(aluno.id)}
+                        >
+                          <div className="font-medium">{aluno.nome}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {aluno.matricula} • {aluno.cpf}
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
               </div>
-              
-              {searchTerm && filteredAlunos.length > 0 && !selectedAluno && (
-                <Card className="mt-2">
-                  <CardContent className="p-2 max-h-60 overflow-y-auto">
-                    {filteredAlunos.map((aluno) => (
-                      <div
-                        key={aluno.id}
-                        className="p-3 hover:bg-accent rounded-md cursor-pointer transition-colors"
-                        onClick={() => handleAlunoSelect(aluno.id)}
-                      >
-                        <div className="font-medium">{aluno.nome}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {aluno.matricula} • {aluno.cpf}
+
+              {/* Datas */}
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="dataInicio">Data de Início</Label>
+                  <Input
+                    id="dataInicio"
+                    type="date"
+                    value={dataInicio}
+                    onChange={(e) => setDataInicio(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="feriasInicio">Início das Férias</Label>
+                  <Input
+                    id="feriasInicio"
+                    type="date"
+                    value={feriasInicio}
+                    onChange={(e) => setFeriasInicio(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <Button
+                onClick={handleGerarCalendario}
+                disabled={!selectedAluno || !dataInicio || !feriasInicio || isGenerating}
+                className="w-full"
+              >
+                {isGenerating ? (
+                  <>Gerando calendário...</>
+                ) : (
+                  <>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    Gerar Calendário
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Dados do Aluno Selecionado */}
+            {selectedAluno && (
+              <div className="lg:col-span-2">
+                <Card className="bg-accent/30 border-primary/20">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Aluno Selecionado</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-xl text-primary">{selectedAluno.nome}</h3>
+                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                        <div className="space-y-1">
+                          <div className="font-medium text-muted-foreground">Dados Pessoais</div>
+                          <div><strong>CPF:</strong> {selectedAluno.cpf}</div>
+                          <div><strong>Matrícula:</strong> {selectedAluno.matricula}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="font-medium text-muted-foreground">Dados Acadêmicos</div>
+                          <div><strong>Curso:</strong> {selectedAluno.curso}</div>
+                          <div><strong>Turno:</strong> {selectedAluno.turno}</div>
+                          <div><strong>Turma:</strong> {getTurmaNome(selectedAluno.turma_id)}</div>
+                          <div><strong>Dia da Aula:</strong> {selectedAluno.dia_aula_semana}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="font-medium text-muted-foreground">Vinculações</div>
+                          <div><strong>Polo:</strong> {getPoloNome(selectedAluno.polo_id)}</div>
+                          <div><strong>Empresa:</strong> {getEmpresaNome(selectedAluno.empresa_id)}</div>
                         </div>
                       </div>
-                    ))}
+                    </div>
                   </CardContent>
                 </Card>
-              )}
-            </div>
-
-            {selectedAluno && (
-              <Card className="bg-accent/50">
-                <CardContent className="p-4">
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-lg">{selectedAluno.nome}</h3>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div><strong>CPF:</strong> {selectedAluno.cpf}</div>
-                      <div><strong>Matrícula:</strong> {selectedAluno.matricula}</div>
-                      <div><strong>Curso:</strong> {selectedAluno.curso}</div>
-                      <div><strong>Turno:</strong> {selectedAluno.turno}</div>
-                      <div><strong>Turma:</strong> {getTurmaNome(selectedAluno.turma_id)}</div>
-                      <div><strong>Empresa:</strong> {getEmpresaNome(selectedAluno.empresa_id)}</div>
-                      <div className="col-span-2"><strong>Dia da Aula:</strong> {selectedAluno.dia_aula_semana}</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              </div>
             )}
+          </div>
+        </CardContent>
+      </Card>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="dataInicio">Data de Início</Label>
-                <Input
-                  id="dataInicio"
-                  type="date"
-                  value={dataInicio}
-                  onChange={(e) => setDataInicio(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="feriasInicio">Início das Férias</Label>
-                <Input
-                  id="feriasInicio"
-                  type="date"
-                  value={feriasInicio}
-                  onChange={(e) => setFeriasInicio(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <Button
-              onClick={handleGerarCalendario}
-              disabled={!selectedAluno || !dataInicio || !feriasInicio || isGenerating}
-              className="w-full"
-            >
-              {isGenerating ? (
-                <>Gerando calendário...</>
-              ) : (
-                <>
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  Gerar Calendário
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Visualização do Calendário */}
-        <Card>
+      {/* Visualização do Calendário */}
+      {calendarioGerado && (
+        <Card className="w-full">
           <CardHeader>
-            <CardTitle>Preview do Calendário</CardTitle>
+            <CardTitle className="flex items-center space-x-2">
+              <CalendarIcon className="h-5 w-5" />
+              <span>Preview do Calendário</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            {calendarioGerado ? (
-              <CalendarioVisualizer calendario={calendarioGerado} />
-            ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
-                <CalendarIcon className="h-16 w-16 mb-4 opacity-50" />
-                <p>Selecione um aluno e gere o calendário para visualizar</p>
-              </div>
-            )}
+            <CalendarioVisualizer calendario={calendarioGerado} />
           </CardContent>
         </Card>
-      </div>
+      )}
+
+      {!calendarioGerado && (
+        <Card className="w-full">
+          <CardContent className="py-16">
+            <div className="flex flex-col items-center justify-center text-center text-muted-foreground">
+              <CalendarIcon className="h-20 w-20 mb-6 opacity-30" />
+              <h3 className="text-lg font-medium mb-2">Nenhum calendário gerado</h3>
+              <p>Selecione um aluno e preencha as datas para gerar o calendário</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

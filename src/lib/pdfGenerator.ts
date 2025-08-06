@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { CalendarioGerado, CalendarioEvento } from '@/types';
-import { mockEmpresas, mockTurmas } from '@/data/mockData';
+import { mockEmpresas, mockTurmas, mockPolos } from '@/data/mockData';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
