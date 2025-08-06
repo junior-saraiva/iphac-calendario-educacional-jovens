@@ -10,12 +10,14 @@ export class PDFGenerator {
   private pageWidth: number;
   private pageHeight: number;
   private margin: number;
+  private currentY: number;
 
   constructor() {
     this.pdf = new jsPDF('p', 'mm', 'a4');
     this.pageWidth = this.pdf.internal.pageSize.getWidth();
     this.pageHeight = this.pdf.internal.pageSize.getHeight();
-    this.margin = 20;
+    this.margin = 15;
+    this.currentY = this.margin;
   }
 
   static async gerarPDF(calendario: CalendarioGerado, nomeAluno: string): Promise<void> {
@@ -41,15 +43,35 @@ export class PDFGenerator {
     const eventosPorMes = this.agruparEventosPorMes(calendario.eventos);
     const meses = Object.keys(eventosPorMes).sort();
 
-    let isFirstPage = true;
+    // Cabeçalho principal uma vez
+    this.adicionarCabecalhoPrincipal(aluno, empresa, turma);
+    
+    // Título do calendário de disciplinas
+    this.currentY += 10;
+    this.pdf.setFontSize(12);
+    this.pdf.setFont('helvetica', 'bold');
+    this.pdf.setFillColor(128, 0, 128); // Roxo
+    this.pdf.rect(this.margin, this.currentY, this.pageWidth - 2 * this.margin, 8, 'F');
+    this.pdf.setTextColor(255, 255, 255);
+    this.pdf.text('Calendário das Disciplinas', this.pageWidth / 2, this.currentY + 6, { align: 'center' });
+    this.pdf.setTextColor(0, 0, 0);
+    this.currentY += 15;
 
-    for (const mesAno of meses) {
-      if (!isFirstPage) {
+    // Desenhar múltiplos meses por página (6 meses por página)
+    const mesesPorPagina = 6;
+    for (let i = 0; i < meses.length; i += mesesPorPagina) {
+      if (i > 0) {
         this.pdf.addPage();
+        this.currentY = this.margin;
       }
       
-      await this.criarPaginaMes(mesAno, eventosPorMes[mesAno], aluno, empresa, turma);
-      isFirstPage = false;
+      const mesesPagina = meses.slice(i, i + mesesPorPagina);
+      await this.desenharMesesEmGrid(mesesPagina, eventosPorMes);
+      
+      // Se é a última página, adicionar legenda e resumo
+      if (i + mesesPorPagina >= meses.length) {
+        this.adicionarLegendaEResumo(calendario.eventos);
+      }
     }
 
     // Download do PDF
@@ -101,19 +123,69 @@ export class PDFGenerator {
     this.adicionarRodape();
   }
 
-  private adicionarCabecalho(aluno: any, empresa: string, turma: string): void {
-    // Título principal
-    this.pdf.setFontSize(16);
+  private adicionarCabecalhoPrincipal(aluno: any, empresa: string, turma: string): void {
+    // Cabeçalho da instituição
+    this.pdf.setFontSize(14);
     this.pdf.setFont('helvetica', 'bold');
-    this.pdf.text('CALENDÁRIO ACADÊMICO', this.pageWidth / 2, 30, { align: 'center' });
+    this.pdf.text('Sistema de Gestão Acadêmica', this.pageWidth / 2, 20, { align: 'center' });
     
-    // Dados do aluno
-    this.pdf.setFontSize(10);
+    this.pdf.setFontSize(8);
     this.pdf.setFont('helvetica', 'normal');
-    this.pdf.text(`Aluno: ${aluno.nome}`, this.margin, 45);
-    this.pdf.text(`Empresa: ${empresa}`, this.margin, 50);
-    this.pdf.text(`Turma: ${turma}`, this.margin, 55);
-    this.pdf.text(`Curso: ${aluno.curso}`, this.margin, 60);
+    this.pdf.text('CNPJ: 00.000.000/0001-00', this.margin, 28);
+    this.pdf.text('ENDEREÇO: Rua Example, 123 - Centro', this.margin, 32);
+    this.pdf.text('CEP: 00000-000', this.margin, 36);
+    this.pdf.text('CIDADE: Porto Alegre', this.pageWidth / 2, 28, { align: 'center' });
+    this.pdf.text('UF: RS', this.pageWidth / 2, 32, { align: 'center' });
+    this.pdf.text('FONE: 0000-0000', this.pageWidth - this.margin, 28, { align: 'right' });
+
+    // Seção Aprendiz/Empresa
+    this.currentY = 45;
+    this.pdf.setFillColor(128, 0, 128); // Roxo
+    this.pdf.rect(this.margin, this.currentY, this.pageWidth - 2 * this.margin, 6, 'F');
+    this.pdf.setTextColor(255, 255, 255);
+    this.pdf.setFontSize(10);
+    this.pdf.setFont('helvetica', 'bold');
+    this.pdf.text('Aprendiz / Empresa', this.pageWidth / 2, this.currentY + 4, { align: 'center' });
+    this.pdf.setTextColor(0, 0, 0);
+
+    // Dados do aprendiz
+    this.currentY += 12;
+    this.pdf.setFontSize(9);
+    this.pdf.setFont('helvetica', 'normal');
+    this.pdf.text(`Aprendiz: ${aluno.id || '00000000'}   ${aluno.nome}`, this.margin, this.currentY);
+    this.pdf.text(`00000   UF: RS`, this.pageWidth - this.margin - 40, this.currentY);
+    
+    this.currentY += 5;
+    this.pdf.text(`Empresa: ${aluno.empresa_id || '0000000'}   ${empresa}`, this.margin, this.currentY);
+
+    // Seção Centro Acadêmico
+    this.currentY += 8;
+    this.pdf.setFillColor(128, 0, 128);
+    this.pdf.rect(this.margin, this.currentY, this.pageWidth - 2 * this.margin, 6, 'F');
+    this.pdf.setTextColor(255, 255, 255);
+    this.pdf.setFont('helvetica', 'bold');
+    this.pdf.text('Centro Acadêmico', this.pageWidth / 2, this.currentY + 4, { align: 'center' });
+    this.pdf.setTextColor(0, 0, 0);
+
+    // Dados acadêmicos
+    this.currentY += 12;
+    this.pdf.setFont('helvetica', 'normal');
+    this.pdf.text(`Gestão: Gestão Educacional - Presencial Conectado`, this.margin, this.currentY);
+    this.pdf.text(`Curso: ${aluno.curso}`, this.pageWidth - this.margin - 60, this.currentY);
+    
+    this.currentY += 5;
+    this.pdf.text(`Matriz: Matriz de 4h - 2023`, this.margin, this.currentY);
+    this.pdf.text(`De Início: 22/04/2025`, this.pageWidth / 2 - 20, this.currentY);
+    this.pdf.text(`Dt Fim: 18/03/2027`, this.pageWidth - this.margin - 40, this.currentY);
+    
+    this.currentY += 5;
+    this.pdf.text(`Turma: ${turma}`, this.margin, this.currentY);
+    this.pdf.text(`CH: 1.960`, this.pageWidth - this.margin - 30, this.currentY);
+  }
+
+  private adicionarCabecalho(aluno: any, empresa: string, turma: string): void {
+    // Método mantido para compatibilidade
+    this.adicionarCabecalhoPrincipal(aluno, empresa, turma);
   }
 
   private async desenharCalendario(dataRef: Date, eventos: CalendarioEvento[]): Promise<void> {
@@ -226,6 +298,161 @@ export class PDFGenerator {
       // Texto
       this.pdf.text(item.label, this.margin + 8, y);
     });
+  }
+
+  private async desenharMesesEmGrid(meses: string[], eventosPorMes: Record<string, CalendarioEvento[]>): Promise<void> {
+    const colunas = 2;
+    const linhas = 3;
+    const larguraMes = (this.pageWidth - 2 * this.margin - 10) / colunas;
+    const alturaMes = 65;
+    
+    for (let i = 0; i < meses.length && i < 6; i++) {
+      const mesAno = meses[i];
+      const [ano, mes] = mesAno.split('-').map(Number);
+      const dataRef = new Date(ano, mes - 1, 1);
+      const eventos = eventosPorMes[mesAno] || [];
+      
+      const coluna = i % colunas;
+      const linha = Math.floor(i / colunas);
+      
+      const x = this.margin + (coluna * (larguraMes + 5));
+      const y = this.currentY + (linha * (alturaMes + 10));
+      
+      await this.desenharMesCompacto(dataRef, eventos, x, y, larguraMes, alturaMes);
+    }
+    
+    this.currentY += (linhas * (alturaMes + 10)) + 15;
+  }
+
+  private async desenharMesCompacto(dataRef: Date, eventos: CalendarioEvento[], x: number, y: number, largura: number, altura: number): Promise<void> {
+    const inicioMes = startOfMonth(dataRef);
+    const fimMes = endOfMonth(dataRef);
+    const diasDoMes = eachDayOfInterval({ start: inicioMes, end: fimMes });
+    
+    // Título do mês
+    this.pdf.setFontSize(10);
+    this.pdf.setFont('helvetica', 'bold');
+    this.pdf.setFillColor(128, 0, 128); // Roxo
+    this.pdf.rect(x, y, largura, 8, 'F');
+    this.pdf.setTextColor(255, 255, 255);
+    const tituloMes = format(dataRef, 'MMM/yy', { locale: ptBR }).toUpperCase();
+    this.pdf.text(tituloMes, x + largura/2, y + 6, { align: 'center' });
+    this.pdf.setTextColor(0, 0, 0);
+
+    // Cabeçalho dos dias
+    const diasSemana = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+    const cellWidth = largura / 7;
+    const cellHeight = 7;
+    
+    this.pdf.setFontSize(7);
+    this.pdf.setFont('helvetica', 'bold');
+    
+    diasSemana.forEach((dia, index) => {
+      const cellX = x + (index * cellWidth);
+      const cellY = y + 8;
+      this.pdf.rect(cellX, cellY, cellWidth, cellHeight);
+      this.pdf.text(dia, cellX + cellWidth/2, cellY + 5, { align: 'center' });
+    });
+
+    // Criar mapa de eventos
+    const eventosMap = new Map();
+    eventos.forEach(evento => {
+      const dateKey = format(evento.data, 'yyyy-MM-dd');
+      eventosMap.set(dateKey, evento);
+    });
+
+    // Desenhar dias
+    let currentRow = 0;
+    let currentCol = getDay(inicioMes);
+    
+    diasDoMes.forEach((dia) => {
+      const cellX = x + (currentCol * cellWidth);
+      const cellY = y + 15 + (currentRow * cellHeight);
+      
+      // Verificar se há evento
+      const dateKey = format(dia, 'yyyy-MM-dd');
+      const evento = eventosMap.get(dateKey);
+      
+      if (evento) {
+        const cor = this.getCorEvento(evento.tipo);
+        this.pdf.setFillColor(cor.r, cor.g, cor.b);
+        this.pdf.rect(cellX, cellY, cellWidth, cellHeight, 'F');
+      }
+      
+      this.pdf.rect(cellX, cellY, cellWidth, cellHeight);
+      
+      // Número do dia
+      this.pdf.setFontSize(6);
+      this.pdf.setFont('helvetica', 'normal');
+      this.pdf.text(dia.getDate().toString(), cellX + 1, cellY + 5);
+      
+      currentCol++;
+      if (currentCol >= 7) {
+        currentCol = 0;
+        currentRow++;
+      }
+    });
+  }
+
+  private adicionarLegendaEResumo(eventos: CalendarioEvento[]): void {
+    // Espaço antes da legenda
+    this.currentY += 10;
+    
+    // Legenda
+    this.pdf.setFontSize(10);
+    this.pdf.setFont('helvetica', 'bold');
+    this.pdf.text('Legenda:', this.margin, this.currentY);
+    
+    const legendaItems = [
+      { tipo: 'teorica', label: 'Aula Teórica', cor: { r: 34, g: 197, b: 94 } },
+      { tipo: 'pratica', label: 'Dia Prático', cor: { r: 59, g: 130, b: 246 } },
+      { tipo: 'feriado', label: 'Feriado', cor: { r: 239, g: 68, b: 68 } },
+      { tipo: 'ferias', label: 'Férias', cor: { r: 251, g: 191, b: 36 } }
+    ];
+    
+    this.currentY += 8;
+    this.pdf.setFontSize(8);
+    this.pdf.setFont('helvetica', 'normal');
+    
+    legendaItems.forEach((item, index) => {
+      const x = this.margin + (index * 40);
+      
+      // Quadrado colorido
+      this.pdf.setFillColor(item.cor.r, item.cor.g, item.cor.b);
+      this.pdf.rect(x, this.currentY - 2, 3, 3, 'F');
+      
+      // Texto
+      this.pdf.text(item.label, x + 6, this.currentY);
+    });
+    
+    // Resumo geral
+    this.currentY += 15;
+    this.pdf.setFontSize(10);
+    this.pdf.setFont('helvetica', 'bold');
+    this.pdf.text('Resumo Geral:', this.margin, this.currentY);
+    
+    this.currentY += 8;
+    this.pdf.setFontSize(8);
+    this.pdf.setFont('helvetica', 'normal');
+    
+    const resumo = {
+      teorica: eventos.filter(e => e.tipo === 'teorica').length,
+      pratica: eventos.filter(e => e.tipo === 'pratica').length,
+      feriado: eventos.filter(e => e.tipo === 'feriado').length,
+      ferias: eventos.filter(e => e.tipo === 'ferias').length
+    };
+    
+    this.pdf.text(`Total de Aulas Teóricas: ${resumo.teorica}`, this.margin, this.currentY);
+    this.currentY += 5;
+    this.pdf.text(`Total de Dias Práticos: ${resumo.pratica}`, this.margin, this.currentY);
+    this.currentY += 5;
+    this.pdf.text(`Total de Feriados: ${resumo.feriado}`, this.margin, this.currentY);
+    this.currentY += 5;
+    this.pdf.text(`Total de Dias de Férias: ${resumo.ferias}`, this.margin, this.currentY);
+    this.currentY += 5;
+    this.pdf.text(`Total de Eventos: ${eventos.length}`, this.margin, this.currentY);
+    
+    this.adicionarRodape();
   }
 
   private adicionarRodape(): void {
