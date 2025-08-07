@@ -21,7 +21,7 @@ export function Calendario() {
   const [calendarioGerado, setCalendarioGerado] = useState<CalendarioGerado | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
-  const { feriados, anoAtual, anos, setAno } = useFeriadosMultiAno();
+  const { feriados } = useFeriadosMultiAno();
   const { trilhas } = useTrilhas();
 
   // Configurar CalendarioGenerator com dados necessários
@@ -67,21 +67,9 @@ export function Calendario() {
       const dataInicioDate = new Date(dataInicio);
       const feriasInicioDate = new Date(feriasInicio);
       
-      // Validar se as datas estão no ano selecionado
-      const anoDataInicio = dataInicioDate.getFullYear();
-      
-      if (anoDataInicio !== anoAtual) {
-        toast({
-          variant: "destructive",
-          title: "Erro de ano",
-          description: `A data de início deve estar no ano selecionado (${anoAtual})`
-        });
-        setIsGenerating(false);
-        return;
-      }
-
-      const dataFim = new Date(dataInicio);
-      dataFim.setFullYear(dataFim.getFullYear() + 1); // 1 ano de contrato
+      // Calcular data fim automaticamente (24 meses a partir da data de início)
+      const dataFim = new Date(dataInicioDate);
+      dataFim.setMonth(dataFim.getMonth() + 24); // Exatamente 24 meses
 
       // Atualizar feriados e trilhas no gerador antes de gerar o calendário
       CalendarioGenerator.setFeriados(feriados);
@@ -96,14 +84,17 @@ export function Calendario() {
 
       setCalendarioGerado(calendario);
       
+      // Calcular duração em meses para feedback
+      const duracaoMeses = Math.round((dataFim.getTime() - dataInicioDate.getTime()) / (1000 * 60 * 60 * 24 * 30));
+      
       // Estatísticas detalhadas
       const eventosTeoricas = calendario.eventos.filter(e => e.tipo === 'teorica').length;
       const eventosPraticas = calendario.eventos.filter(e => e.tipo === 'pratica').length;
       const eventosFeriados = calendario.eventos.filter(e => e.tipo === 'feriado').length;
       
       toast({
-        title: `✅ Calendário ${anoAtual} gerado com sucesso!`,
-        description: `${selectedAluno.nome}: ${eventosTeoricas} teóricas, ${eventosPraticas} práticas, ${eventosFeriados} feriados aplicados`
+        title: `✅ Calendário gerado com sucesso!`,
+        description: `${selectedAluno.nome}: ${duracaoMeses} meses, ${eventosTeoricas} teóricas, ${eventosPraticas} práticas, ${eventosFeriados} feriados`
       });
     } catch (error) {
       console.error('Erro na geração do calendário:', error);
@@ -148,22 +139,6 @@ export function Calendario() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Busca do Aluno */}
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="ano">Ano do Calendário</Label>
-                <Select value={anoAtual.toString()} onValueChange={(value) => setAno(parseInt(value))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o ano" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {anos.map((ano) => (
-                      <SelectItem key={ano} value={ano.toString()}>
-                        {ano}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="search">Buscar Aluno</Label>
                 <div className="relative">
@@ -217,6 +192,17 @@ export function Calendario() {
                     onChange={(e) => setFeriasInicio(e.target.value)}
                   />
                 </div>
+                {dataInicio && (
+                  <div className="p-3 bg-accent/20 rounded-md border">
+                    <div className="text-sm font-medium text-muted-foreground mb-1">Duração do Contrato:</div>
+                    <div className="text-sm">
+                      <strong>Data Final:</strong> {new Date(new Date(dataInicio).setMonth(new Date(dataInicio).getMonth() + 24)).toLocaleDateString('pt-BR')}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      24 meses (máximo legal)
+                    </div>
+                  </div>
+                )}
               </div>
 
               <Button

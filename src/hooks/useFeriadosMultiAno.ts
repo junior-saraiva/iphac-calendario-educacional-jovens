@@ -22,7 +22,7 @@ const STORAGE_KEY_PREFIX = 'feriados_';
 export function useFeriadosMultiAno(): UseFeriadosMultiAnoReturn {
   const [feriados, setFeriados] = useState<Feriado[]>([]);
   const [loading, setLoading] = useState(true);
-  const [anoAtual, setAnoAtual] = useState<number>(new Date().getFullYear());
+  const [anoAtual, setAnoAtual] = useState<number>(2025); // Ano padrão fixo
 
   // Função para carregar feriados de um ano específico
   const carregarFeriadosAno = useCallback((ano: number) => {
@@ -64,16 +64,22 @@ export function useFeriadosMultiAno(): UseFeriadosMultiAnoReturn {
     }
   }, []);
 
-  // Efeito para carregar feriados quando o ano muda
+  // Efeito para carregar feriados de todos os anos suportados
   useEffect(() => {
     setLoading(true);
-    const feriadosAno = carregarFeriadosAno(anoAtual);
-    setFeriados(feriadosAno);
     
-    // Salvar no localStorage se não estava salvo
-    salvarFeriadosAno(anoAtual, feriadosAno);
+    // Carregar feriados de todos os anos suportados para contratos multi-ano
+    const todosFeriados: Feriado[] = [];
+    
+    ANOS_SUPORTADOS.forEach(ano => {
+      const feriadosAno = carregarFeriadosAno(ano);
+      todosFeriados.push(...feriadosAno);
+      salvarFeriadosAno(ano, feriadosAno);
+    });
+    
+    setFeriados(todosFeriados);
     setLoading(false);
-  }, [anoAtual, carregarFeriadosAno, salvarFeriadosAno]);
+  }, [carregarFeriadosAno, salvarFeriadosAno]);
 
   // Função para mudar o ano
   const setAno = useCallback((novoAno: number) => {

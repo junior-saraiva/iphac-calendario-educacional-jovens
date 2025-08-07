@@ -25,7 +25,7 @@ export class ValidadorCalendario {
     }
 
     // Validar duração máxima do contrato (máximo 24 meses)
-    if (duracaoMeses > 24) {
+    if (duracaoMeses > 24.5) { // Tolerância de meio mês para variações de dias
       erros.push('Duração do contrato não pode exceder 24 meses');
     }
 
