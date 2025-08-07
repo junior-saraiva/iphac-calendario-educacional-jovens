@@ -1,3 +1,5 @@
+import { Feriado } from '@/types';
+
 export const feriadosNacionais2025: Feriado[] = [
   { id: 'real-2025-18042025-brasil', data: '2025-04-18', descricao: 'Sexta-Feira Santa - Brasil', nivel: 'nacional' },
   { id: 'real-2025-21042025-brasil', data: '2025-04-21', descricao: 'Dia de Tiradentes - Brasil', nivel: 'nacional' },

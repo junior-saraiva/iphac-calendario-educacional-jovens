@@ -1,3 +1,5 @@
+import { Feriado } from '@/types';
+
 export const feriadosEstaduais2025: Feriado[] = [
   { id: 'real-2025-23012025-ac', data: '2025-01-23', descricao: 'Dia do Evangélico - Brasil', nivel: 'estadual' },
   { id: 'real-2025-08032025-ac', data: '2025-03-08', descricao: 'Dia da Mulher - Brasil', nivel: 'estadual' },

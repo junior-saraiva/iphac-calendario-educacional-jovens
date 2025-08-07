@@ -2,14 +2,14 @@ import { Feriado } from '@/types';
 import { feriadosNacionais2025 } from './feriados_nacionais_2025';
 import { feriadosEstaduais2025 } from './feriados_estaduais_2025';
 import { feriadosFacultativos2025 } from './feriados_facultativos_2025';
-// import { feriadosMunicipais2025 } from './index_feriados_municipais_2025'; // Temporariamente comentado devido a erros de sintaxe
+import { feriadosMunicipais2025 } from './index_feriados_municipais_2025';
 
 // Arquivo final combinando todos os feriados reais de 2025
 export const feriadosReaisCombinados2025: Feriado[] = [
   ...feriadosNacionais2025,
   ...feriadosEstaduais2025,
   ...feriadosFacultativos2025,
-  // ...feriadosMunicipais2025, // Temporariamente comentado devido a erros de sintaxe
+  ...feriadosMunicipais2025,
 ];
 
 // Estatísticas dos feriados por tipo
@@ -17,7 +17,7 @@ export const estatisticasFeriados2025 = {
   nacionais: feriadosNacionais2025.length,
   estaduais: feriadosEstaduais2025.length,
   facultativos: feriadosFacultativos2025.length,
-  municipais: 0, // feriadosMunicipais2025.length, // Temporariamente 0 devido a erros de sintaxe
+  municipais: feriadosMunicipais2025.length,
   total: feriadosReaisCombinados2025.length,
 };
 

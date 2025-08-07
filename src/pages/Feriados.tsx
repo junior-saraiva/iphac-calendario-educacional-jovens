@@ -23,7 +23,7 @@ export function Feriados() {
   const [formData, setFormData] = useState({
     data: '',
     descricao: '',
-    nivel: 'nacional' as 'nacional' | 'estadual' | 'municipal'
+    nivel: 'nacional' as 'nacional' | 'estadual' | 'municipal' | 'facultativo'
   });
 
   useEffect(() => {
@@ -144,6 +144,7 @@ export function Feriados() {
       case 'nacional': return 'default';
       case 'estadual': return 'secondary';
       case 'municipal': return 'outline';
+      case 'facultativo': return 'destructive';
       default: return 'default';
     }
   };
@@ -214,6 +215,7 @@ export function Feriados() {
                       <SelectItem value="nacional">Nacional</SelectItem>
                       <SelectItem value="estadual">Estadual</SelectItem>
                       <SelectItem value="municipal">Municipal</SelectItem>
+                      <SelectItem value="facultativo">Facultativo</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

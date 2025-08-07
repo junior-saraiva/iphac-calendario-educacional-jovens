@@ -1,3 +1,5 @@
+import { Feriado } from '@/types';
+
 export const feriadosFacultativos2025: Feriado[] = [
   { id: 'real-2025-04032025-brasil', data: '2025-03-04', descricao: 'Carnaval - Brasil', nivel: 'facultativo' },
   { id: 'real-2025-05032025-brasil', data: '2025-03-05', descricao: 'Carnaval - Brasil', nivel: 'facultativo' },
