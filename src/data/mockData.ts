@@ -160,15 +160,7 @@ export const mockAlunos: Aluno[] = [
   }
 ];
 
-export const mockFeriados: Feriado[] = [
-  { id: '1', data: '2024-01-01', descricao: 'Confraternização Universal', nivel: 'nacional' },
-  { id: '2', data: '2024-02-12', descricao: 'Carnaval', nivel: 'nacional' },
-  { id: '3', data: '2024-02-13', descricao: 'Carnaval', nivel: 'nacional' },
-  { id: '4', data: '2024-04-21', descricao: 'Tiradentes', nivel: 'nacional' },
-  { id: '5', data: '2024-05-01', descricao: 'Dia do Trabalhador', nivel: 'nacional' },
-  { id: '6', data: '2024-09-07', descricao: 'Independência do Brasil', nivel: 'nacional' },
-  { id: '7', data: '2024-10-12', descricao: 'Nossa Senhora Aparecida', nivel: 'nacional' },
-  { id: '8', data: '2024-11-02', descricao: 'Finados', nivel: 'nacional' },
-  { id: '9', data: '2024-11-15', descricao: 'Proclamação da República', nivel: 'nacional' },
-  { id: '10', data: '2024-12-25', descricao: 'Natal', nivel: 'nacional' },
-];
+// Importar feriados reais de 2025
+import { feriadosReaisCombinados2025 } from './index_feriados_reais_combinados_2025';
+
+export const mockFeriados: Feriado[] = feriadosReaisCombinados2025;

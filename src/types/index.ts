@@ -60,7 +60,7 @@ export interface Feriado {
   id: string;
   data: string;
   descricao: string;
-  nivel: 'nacional' | 'estadual' | 'municipal';
+  nivel: 'nacional' | 'estadual' | 'municipal' | 'facultativo';
 }
 
 export interface CalendarioPDF {
