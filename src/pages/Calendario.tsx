@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,13 @@ export function Calendario() {
   const { toast } = useToast();
   const { feriados } = useFeriados();
   const { trilhas } = useTrilhas();
+
+  // Configurar CalendarioGenerator com dados necessários
+  useEffect(() => {
+    CalendarioGenerator.setFeriados(feriados);
+    CalendarioGenerator.setTrilhas(trilhas);
+    CalendarioGenerator.setPolos(mockPolos);
+  }, [feriados, trilhas]);
 
   const normalizeString = (str: string) => {
     return str
@@ -71,15 +78,22 @@ export function Calendario() {
       );
 
       setCalendarioGerado(calendario);
+      
+      // Estatísticas detalhadas
+      const eventosTeoricas = calendario.eventos.filter(e => e.tipo === 'teorica').length;
+      const eventosPraticas = calendario.eventos.filter(e => e.tipo === 'pratica').length;
+      const eventosFeriados = calendario.eventos.filter(e => e.tipo === 'feriado').length;
+      
       toast({
-        title: "Calendário gerado com sucesso!",
-        description: `Calendário criado para ${selectedAluno.nome} com ${feriados.length} feriados e ${trilhas.length} trilhas`
+        title: "✅ Calendário gerado com regras refinadas!",
+        description: `${selectedAluno.nome}: ${eventosTeoricas} teóricas, ${eventosPraticas} práticas, ${eventosFeriados} feriados aplicados por localização`
       });
     } catch (error) {
+      console.error('Erro na geração do calendário:', error);
       toast({
         variant: "destructive",
-        title: "Erro ao gerar calendário",
-        description: "Ocorreu um erro durante a geração. Tente novamente."
+        title: "Erro na validação",
+        description: error instanceof Error ? error.message : "Verifique as datas e dados do aluno."
       });
     } finally {
       setIsGenerating(false);
