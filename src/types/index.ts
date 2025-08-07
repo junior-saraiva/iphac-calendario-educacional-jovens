@@ -40,6 +40,7 @@ export interface Disciplina {
   trilha_id: string;
   nome: string;
   carga_horaria: number;
+  quantidade_encontros: number;
   dias_aula: string[];
 }
 

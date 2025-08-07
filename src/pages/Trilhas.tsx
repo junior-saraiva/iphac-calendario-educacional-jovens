@@ -46,6 +46,7 @@ export function Trilhas() {
   const [disciplinaFormData, setDisciplinaFormData] = useState({
     nome: '',
     carga_horaria: '',
+    quantidade_encontros: '',
     dias_aula: [] as string[]
   });
 
@@ -79,7 +80,7 @@ export function Trilhas() {
   };
 
   const handleSalvarDisciplina = () => {
-    if (!disciplinaFormData.nome || !disciplinaFormData.carga_horaria || !selectedTrilhaId) {
+    if (!disciplinaFormData.nome || !disciplinaFormData.carga_horaria || !disciplinaFormData.quantidade_encontros || !selectedTrilhaId) {
       toast({
         title: 'Erro',
         description: 'Preencha todos os campos obrigatórios.',
@@ -91,7 +92,8 @@ export function Trilhas() {
     const dadosDisciplina = {
       ...disciplinaFormData,
       trilha_id: selectedTrilhaId,
-      carga_horaria: parseInt(disciplinaFormData.carga_horaria)
+      carga_horaria: parseInt(disciplinaFormData.carga_horaria),
+      quantidade_encontros: parseInt(disciplinaFormData.quantidade_encontros)
     };
 
     if (editingDisciplina) {
@@ -110,7 +112,7 @@ export function Trilhas() {
 
     setIsDisciplinaDialogOpen(false);
     setEditingDisciplina(null);
-    setDisciplinaFormData({ nome: '', carga_horaria: '', dias_aula: [] });
+    setDisciplinaFormData({ nome: '', carga_horaria: '', quantidade_encontros: '', dias_aula: [] });
   };
 
   const handleEditarTrilha = (trilha: Trilha) => {
@@ -130,6 +132,7 @@ export function Trilhas() {
     setDisciplinaFormData({
       nome: disciplina.nome,
       carga_horaria: disciplina.carga_horaria.toString(),
+      quantidade_encontros: disciplina.quantidade_encontros.toString(),
       dias_aula: disciplina.dias_aula
     });
     setIsDisciplinaDialogOpen(true);
@@ -144,7 +147,7 @@ export function Trilhas() {
   const handleNovaDisciplina = (trilhaId: string) => {
     setEditingDisciplina(null);
     setSelectedTrilhaId(trilhaId);
-    setDisciplinaFormData({ nome: '', carga_horaria: '', dias_aula: [] });
+    setDisciplinaFormData({ nome: '', carga_horaria: '', quantidade_encontros: '', dias_aula: [] });
     setIsDisciplinaDialogOpen(true);
   };
 
@@ -392,6 +395,7 @@ export function Trilhas() {
                                 <TableRow>
                                   <TableHead>Nome</TableHead>
                                   <TableHead>Carga Horária</TableHead>
+                                  <TableHead>Qtd. Encontros</TableHead>
                                   <TableHead className="text-right">Ações</TableHead>
                                 </TableRow>
                               </TableHeader>
@@ -405,6 +409,12 @@ export function Trilhas() {
                                       <div className="flex items-center space-x-1">
                                         <Clock className="h-4 w-4" />
                                         <span>{disciplina.carga_horaria}h</span>
+                                      </div>
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="flex items-center space-x-1">
+                                        <BookOpen className="h-4 w-4" />
+                                        <span>{disciplina.quantidade_encontros}</span>
                                       </div>
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -490,6 +500,16 @@ export function Trilhas() {
                 placeholder="Ex: 80"
                 value={disciplinaFormData.carga_horaria}
                 onChange={(e) => setDisciplinaFormData(prev => ({ ...prev, carga_horaria: e.target.value }))}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="quantidadeEncontros">Quantidade de Encontros</Label>
+              <Input
+                id="quantidadeEncontros"
+                type="number"
+                placeholder="Ex: 10"
+                value={disciplinaFormData.quantidade_encontros}
+                onChange={(e) => setDisciplinaFormData(prev => ({ ...prev, quantidade_encontros: e.target.value }))}
               />
             </div>
           </div>

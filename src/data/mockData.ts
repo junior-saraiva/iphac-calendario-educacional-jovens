@@ -40,14 +40,14 @@ export const mockTurmas: Turma[] = [
 ];
 
 export const mockDisciplinas: Disciplina[] = [
-  { id: '1', trilha_id: '1', nome: 'Introdução à Programação', carga_horaria: 80, dias_aula: [] },
-  { id: '2', trilha_id: '1', nome: 'Lógica de Programação', carga_horaria: 60, dias_aula: [] },
-  { id: '3', trilha_id: '2', nome: 'HTML e CSS', carga_horaria: 100, dias_aula: [] },
-  { id: '4', trilha_id: '2', nome: 'JavaScript Básico', carga_horaria: 120, dias_aula: [] },
-  { id: '5', trilha_id: '3', nome: 'React Framework', carga_horaria: 140, dias_aula: [] },
-  { id: '6', trilha_id: '3', nome: 'Node.js Backend', carga_horaria: 160, dias_aula: [] },
-  { id: '7', trilha_id: '4', nome: 'Preparação para Entrevistas', carga_horaria: 40, dias_aula: [] },
-  { id: '8', trilha_id: '4', nome: 'Soft Skills', carga_horaria: 60, dias_aula: [] },
+  { id: '1', trilha_id: '1', nome: 'Introdução à Programação', carga_horaria: 80, quantidade_encontros: 10, dias_aula: [] },
+  { id: '2', trilha_id: '1', nome: 'Lógica de Programação', carga_horaria: 60, quantidade_encontros: 8, dias_aula: [] },
+  { id: '3', trilha_id: '2', nome: 'HTML e CSS', carga_horaria: 100, quantidade_encontros: 12, dias_aula: [] },
+  { id: '4', trilha_id: '2', nome: 'JavaScript Básico', carga_horaria: 120, quantidade_encontros: 15, dias_aula: [] },
+  { id: '5', trilha_id: '3', nome: 'React Framework', carga_horaria: 140, quantidade_encontros: 18, dias_aula: [] },
+  { id: '6', trilha_id: '3', nome: 'Node.js Backend', carga_horaria: 160, quantidade_encontros: 20, dias_aula: [] },
+  { id: '7', trilha_id: '4', nome: 'Preparação para Entrevistas', carga_horaria: 40, quantidade_encontros: 5, dias_aula: [] },
+  { id: '8', trilha_id: '4', nome: 'Soft Skills', carga_horaria: 60, quantidade_encontros: 8, dias_aula: [] },
 ];
 
 export const mockTrilhas: Trilha[] = [
