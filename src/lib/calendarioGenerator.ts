@@ -109,6 +109,13 @@ export class CalendarioGenerator {
     );
     eventos.push(...modulosRegularesEventos);
 
+    // Filtrar feriados pelo ano da data de início
+    const anoInicio = dataInicioAjustada.getFullYear();
+    const feriadosDoAno = this.feriados.filter(feriado => {
+      const anoFeriado = new Date(feriado.data).getFullYear();
+      return anoFeriado === anoInicio;
+    });
+
     // Adicionar feriados por localização (priorizar cidade da empresa)
     if (polo) {
       const empresaInfo = empresa ? { cidade: empresa.cidade, uf: empresa.estado } : undefined;
@@ -117,7 +124,7 @@ export class CalendarioGenerator {
         dataFim, 
         aluno, 
         polo, 
-        this.feriados,
+        feriadosDoAno,
         empresaInfo
       );
       eventos.push(...feriadosEventos);

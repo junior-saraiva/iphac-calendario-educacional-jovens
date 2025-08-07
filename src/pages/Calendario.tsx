@@ -9,7 +9,7 @@ import { CalendarioGenerator } from '@/lib/calendarioGenerator';
 import { Search, Calendar as CalendarIcon, Users } from 'lucide-react';
 import { mockAlunos, mockEmpresas, mockTurmas, mockPolos } from '@/data/mockData';
 import { useToast } from '@/hooks/use-toast';
-import { useFeriados } from '@/hooks/useFeriados';
+import { useFeriadosMultiAno } from '@/hooks/useFeriadosMultiAno';
 import { useTrilhas } from '@/hooks/useTrilhas';
 import { Aluno, CalendarioGerado } from '@/types';
 
@@ -21,7 +21,7 @@ export function Calendario() {
   const [calendarioGerado, setCalendarioGerado] = useState<CalendarioGerado | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
-  const { feriados } = useFeriados();
+  const { feriados, anoAtual, anos, setAno } = useFeriadosMultiAno();
   const { trilhas } = useTrilhas();
 
   // Configurar CalendarioGenerator com dados necessários
@@ -64,6 +64,22 @@ export function Calendario() {
 
     setIsGenerating(true);
     try {
+      const dataInicioDate = new Date(dataInicio);
+      const feriasInicioDate = new Date(feriasInicio);
+      
+      // Validar se as datas estão no ano selecionado
+      const anoDataInicio = dataInicioDate.getFullYear();
+      
+      if (anoDataInicio !== anoAtual) {
+        toast({
+          variant: "destructive",
+          title: "Erro de ano",
+          description: `A data de início deve estar no ano selecionado (${anoAtual})`
+        });
+        setIsGenerating(false);
+        return;
+      }
+
       const dataFim = new Date(dataInicio);
       dataFim.setFullYear(dataFim.getFullYear() + 1); // 1 ano de contrato
 
@@ -73,9 +89,9 @@ export function Calendario() {
 
       const calendario = CalendarioGenerator.gerarCalendario(
         selectedAluno,
-        new Date(dataInicio),
+        dataInicioDate,
         dataFim,
-        new Date(feriasInicio)
+        feriasInicioDate
       );
 
       setCalendarioGerado(calendario);
@@ -86,8 +102,8 @@ export function Calendario() {
       const eventosFeriados = calendario.eventos.filter(e => e.tipo === 'feriado').length;
       
       toast({
-        title: "✅ Calendário gerado com regras refinadas!",
-        description: `${selectedAluno.nome}: ${eventosTeoricas} teóricas, ${eventosPraticas} práticas, ${eventosFeriados} feriados aplicados por localização`
+        title: `✅ Calendário ${anoAtual} gerado com sucesso!`,
+        description: `${selectedAluno.nome}: ${eventosTeoricas} teóricas, ${eventosPraticas} práticas, ${eventosFeriados} feriados aplicados`
       });
     } catch (error) {
       console.error('Erro na geração do calendário:', error);
@@ -132,6 +148,22 @@ export function Calendario() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Busca do Aluno */}
             <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="ano">Ano do Calendário</Label>
+                <Select value={anoAtual.toString()} onValueChange={(value) => setAno(parseInt(value))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o ano" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {anos.map((ano) => (
+                      <SelectItem key={ano} value={ano.toString()}>
+                        {ano}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="search">Buscar Aluno</Label>
                 <div className="relative">
