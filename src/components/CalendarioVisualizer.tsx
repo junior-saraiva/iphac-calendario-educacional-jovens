@@ -162,7 +162,7 @@ export function CalendarioVisualizer({ calendario }: CalendarioVisualizerProps) 
                 <div
                   key={dia.toString()}
                   className={cn(
-                    "h-24 p-2 border rounded-lg transition-colors relative",
+                    "h-20 p-2 border rounded-lg transition-colors relative",
                     isToday && "ring-2 ring-primary",
                     !isSameMonth(dia, mesAtual) && "opacity-50",
                     "hover:bg-accent/50"

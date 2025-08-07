@@ -1,4 +1,4 @@
-import { Aluno, CalendarioGerado, CalendarioEvento, Feriado, ResumoTrilha, Trilha, Polo } from '@/types';
+import { Aluno, CalendarioGerado, CalendarioEvento, Feriado, ResumoTrilha, Trilha, Polo, Empresa } from '@/types';
 import { addDays, format, isSameDay, isWeekend, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ValidadorCalendario } from './calendario/validacoes';
@@ -11,6 +11,7 @@ export class CalendarioGenerator {
   private static feriados: Feriado[] = [];
   private static trilhas: Trilha[] = [];
   private static polos: Polo[] = [];
+  private static empresas: Empresa[] = [];
 
   static setFeriados(feriados: Feriado[]) {
     this.feriados = feriados;
@@ -24,6 +25,10 @@ export class CalendarioGenerator {
 
   static setPolos(polos: Polo[]) {
     this.polos = polos;
+  }
+
+  static setEmpresas(empresas: Empresa[]) {
+    this.empresas = empresas;
   }
 
   static getFeriados(): Feriado[] {
@@ -70,6 +75,12 @@ export class CalendarioGenerator {
       console.warn(`[CALENDARIO] Polo não encontrado para ID: ${aluno.polo_id}`);
     }
 
+    // Obter empresa do aluno
+    const empresa = this.empresas.find(e => e.id === aluno.empresa_id);
+    if (!empresa) {
+      console.warn(`[CALENDARIO] Empresa não encontrada para ID: ${aluno.empresa_id}`);
+    }
+
     const eventos: CalendarioEvento[] = [];
     
     // Ajustar data de início se cair em fim de semana
@@ -98,14 +109,16 @@ export class CalendarioGenerator {
     );
     eventos.push(...modulosRegularesEventos);
 
-    // Adicionar feriados por localização
+    // Adicionar feriados por localização (priorizar cidade da empresa)
     if (polo) {
+      const empresaInfo = empresa ? { cidade: empresa.cidade, uf: empresa.estado } : undefined;
       const feriadosEventos = GeradorFeriados.adicionarFeriados(
         dataInicioAjustada, 
         dataFim, 
         aluno, 
         polo, 
-        this.feriados
+        this.feriados,
+        empresaInfo
       );
       eventos.push(...feriadosEventos);
     }

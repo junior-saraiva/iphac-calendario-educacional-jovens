@@ -29,6 +29,7 @@ export function Calendario() {
     CalendarioGenerator.setFeriados(feriados);
     CalendarioGenerator.setTrilhas(trilhas);
     CalendarioGenerator.setPolos(mockPolos);
+    CalendarioGenerator.setEmpresas(mockEmpresas);
   }, [feriados, trilhas]);
 
   const normalizeString = (str: string) => {

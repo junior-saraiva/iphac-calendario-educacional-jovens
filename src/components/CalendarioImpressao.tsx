@@ -127,21 +127,23 @@ export function CalendarioImpressao({ calendario }: CalendarioImpressaoProps) {
                   
                   <div className="grid-dias">
                     <div className="cabecalho-dias">
+                      <div className="dia-header">DOM</div>
                       <div className="dia-header">SEG</div>
                       <div className="dia-header">TER</div>
                       <div className="dia-header">QUA</div>
                       <div className="dia-header">QUI</div>
                       <div className="dia-header">SEX</div>
+                      <div className="dia-header">SÁB</div>
                     </div>
                     
                     <div className="dias-mes">
-                      {mes.dias.map((dia) => (
+                      {mes.dias.map((dia, index) => (
                         <div 
-                          key={dia.data.toISOString()}
-                          className={`celula-dia ${dia.evento ? `evento-${dia.evento.tipo}` : ''}`}
+                          key={`${dia.data.toISOString()}-${index}`}
+                          className={`celula-dia ${dia.evento ? `evento-${dia.evento.tipo}` : ''} ${dia.isOutroMes ? 'outro-mes' : ''}`}
                         >
                           <div className="numero-dia">{dia.numero}</div>
-                          {dia.evento && (
+                          {dia.evento && !dia.isOutroMes && (
                             <div className="evento-info">
                               <div className="evento-tipo">{obterTextoTipoEvento(dia.evento.tipo)}</div>
                               {dia.evento.disciplina && (
@@ -223,35 +225,50 @@ function obterDiasDoMes(primeiroDiaMes: Date, eventos: CalendarioEvento[]) {
   const mes = primeiroDiaMes.getMonth();
   const dias: DiaCalendario[] = [];
 
-  // Primeiro dia útil do mês (segunda-feira)
-  const primeiraSegunda = new Date(ano, mes, 1);
-  while (primeiraSegunda.getDay() !== 1) {
-    primeiraSegunda.setDate(primeiraSegunda.getDate() + 1);
+  // Obter todos os dias do mês (incluindo fins de semana)
+  const primeiroDia = new Date(ano, mes, 1);
+  const ultimoDia = new Date(ano, mes + 1, 0);
+
+  // Adicionar dias vazios no início para alinhamento da grade (domingo = 0)
+  const diaSemanaPrimeiroDia = primeiroDia.getDay();
+  for (let i = 0; i < diaSemanaPrimeiroDia; i++) {
+    const diaAnterior = new Date(primeiroDia);
+    diaAnterior.setDate(diaAnterior.getDate() - (diaSemanaPrimeiroDia - i));
+    dias.push({
+      numero: diaAnterior.getDate(),
+      data: new Date(diaAnterior),
+      evento: undefined,
+      isOutroMes: true
+    });
   }
 
-  // Última sexta-feira do mês
-  const ultimaData = new Date(ano, mes + 1, 0);
-  while (ultimaData.getDay() !== 5) {
-    ultimaData.setDate(ultimaData.getDate() - 1);
+  // Adicionar todos os dias do mês atual
+  for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
+    const dataAtual = new Date(ano, mes, dia);
+    const evento = eventos.find(e => 
+      new Date(e.data).toDateString() === dataAtual.toDateString()
+    );
+
+    dias.push({
+      numero: dia,
+      data: new Date(dataAtual),
+      evento,
+      isOutroMes: false
+    });
   }
 
-  let dataAtual = new Date(primeiraSegunda);
-  
-  while (dataAtual <= ultimaData) {
-    // Apenas dias úteis (segunda a sexta)
-    if (dataAtual.getDay() >= 1 && dataAtual.getDay() <= 5) {
-      const evento = eventos.find(e => 
-        new Date(e.data).toDateString() === dataAtual.toDateString()
-      );
-
-      dias.push({
-        numero: dataAtual.getDate(),
-        data: new Date(dataAtual),
-        evento
-      });
-    }
-    
-    dataAtual.setDate(dataAtual.getDate() + 1);
+  // Adicionar dias vazios no final para completar a grade
+  const totalCelulas = Math.ceil(dias.length / 7) * 7;
+  const diasRestantes = totalCelulas - dias.length;
+  for (let i = 1; i <= diasRestantes; i++) {
+    const proximoDia = new Date(ultimoDia);
+    proximoDia.setDate(proximoDia.getDate() + i);
+    dias.push({
+      numero: proximoDia.getDate(),
+      data: new Date(proximoDia),
+      evento: undefined,
+      isOutroMes: true
+    });
   }
 
   return dias;
@@ -285,4 +302,5 @@ interface DiaCalendario {
   numero: number;
   data: Date;
   evento?: CalendarioEvento;
+  isOutroMes?: boolean;
 }

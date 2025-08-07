@@ -10,15 +10,20 @@ export class GeradorFeriados {
     dataFim: Date,
     aluno: Aluno,
     polo: Polo,
-    todosFeriados: Feriado[]
+    todosFeriados: Feriado[],
+    empresa?: { cidade: string; uf: string }
   ): CalendarioEvento[] {
-    console.log(`[FERIADOS] Filtrando feriados para ${polo.cidade}/${polo.uf}`);
+    // Usar cidade da empresa se disponível, senão usar cidade do polo
+    const cidadeFeriados = empresa?.cidade || polo.cidade;
+    const ufFeriados = empresa?.uf || polo.uf;
+    
+    console.log(`[FERIADOS] Filtrando feriados para ${cidadeFeriados}/${ufFeriados} (empresa: ${empresa ? 'SIM' : 'NÃO'})`);
     
     // Filtrar feriados relevantes por localização e hierarquia
     const feriadosRelevantes = this.filtrarFeriadosPorLocalizacao(
       todosFeriados,
-      polo.cidade,
-      polo.uf
+      cidadeFeriados,
+      ufFeriados
     );
 
     // Filtrar feriados que estão no período do calendário

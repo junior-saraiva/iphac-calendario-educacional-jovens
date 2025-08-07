@@ -258,7 +258,7 @@ All colors MUST be HSL.
 
 .cabecalho-dias {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   background: #f7fafc;
   border-bottom: 1px solid #e2e8f0;
 }
@@ -275,7 +275,7 @@ All colors MUST be HSL.
 
 .dias-mes {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   gap: 1px;
   background: #e2e8f0;
 }
@@ -434,4 +434,253 @@ All colors MUST be HSL.
     grid-template-columns: 1fr;
     grid-template-rows: repeat(6, 1fr);
   }
+}
+
+/* Estilos específicos para impressão do calendário */
+@media print {
+  .print\:hidden {
+    display: none !important;
+  }
+  
+  .pagina-calendario {
+    page-break-after: auto;
+    padding: 15px;
+    margin: 0;
+  }
+  
+  .grid-meses {
+    gap: 15px;
+  }
+  
+  .celula-dia {
+    min-height: 50px;
+  }
+}
+
+.calendario-impressao {
+  font-family: 'Open Sans', sans-serif;
+  line-height: 1.4;
+}
+
+.cabecalho-pagina {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #5C0077;
+}
+
+.logo-container {
+  margin-right: 30px;
+}
+
+.logo-iphac {
+  height: 60px;
+  width: auto;
+}
+
+.info-principal {
+  flex: 1;
+}
+
+.titulo-principal {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  color: #5C0077;
+  margin: 0 0 10px 0;
+}
+
+.nome-aluno {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #A0008F;
+  margin: 0 0 10px 0;
+}
+
+.detalhes-aluno {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+.calendario-mensal {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cabecalho-mes {
+  background-color: #5C0077;
+  color: white;
+  padding: 10px;
+  text-align: center;
+}
+
+.titulo-mes {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.grid-dias {
+  background: white;
+}
+
+.cabecalho-dias {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+}
+
+.dia-header {
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: bold;
+  color: #666;
+}
+
+.dias-mes {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.celula-dia {
+  border: 1px solid #eee;
+  min-height: 60px;
+  padding: 4px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+}
+
+.celula-dia.outro-mes {
+  background-color: #f9f9f9;
+  opacity: 0.5;
+}
+
+.numero-dia {
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.evento-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.evento-tipo {
+  font-weight: bold;
+  text-align: center;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+
+.evento-disciplina {
+  font-size: 9px;
+  text-align: center;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Cores dos eventos */
+.evento-teorica .evento-tipo {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #4caf50;
+}
+
+.evento-pratica .evento-tipo {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #2196f3;
+}
+
+.evento-feriado .evento-tipo {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #f44336;
+}
+
+.evento-ferias .evento-tipo {
+  background-color: #fff8e1;
+  color: #f57c00;
+  border: 1px solid #ff9800;
+}
+
+.legenda-eventos {
+  margin: 30px 0;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.titulo-legenda {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #5C0077;
+  margin: 0 0 15px 0;
+}
+
+.itens-legenda {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.item-legenda {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.cor-evento {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.cor-evento.evento-teorica {
+  background-color: #4caf50;
+}
+
+.cor-evento.evento-pratica {
+  background-color: #2196f3;
+}
+
+.cor-evento.evento-feriado {
+  background-color: #f44336;
+}
+
+.cor-evento.evento-ferias {
+  background-color: #ff9800;
+}
+
+.rodape-pagina {
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px solid #ddd;
+}
+
+.info-rodape {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
 }
