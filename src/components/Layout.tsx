@@ -10,7 +10,9 @@ import {
   CalendarDays, 
   FileText, 
   LogOut,
-  Home
+  Home,
+  Settings,
+  ListTree
 } from 'lucide-react';
 
 export function Layout() {

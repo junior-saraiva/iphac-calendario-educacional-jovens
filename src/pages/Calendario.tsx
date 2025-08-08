@@ -12,6 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useFeriadosMultiAno } from '@/hooks/useFeriadosMultiAno';
 import { useTrilhas } from '@/hooks/useTrilhas';
 import { Aluno, CalendarioGerado } from '@/types';
+import { searchAlunosView, AlunoViewRow } from '@/integrations/supabase/queries/alunosView';
+import { logEvent } from '@/lib/logs';
 
 export function Calendario() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +22,10 @@ export function Calendario() {
   const [feriasInicio, setFeriasInicio] = useState('');
   const [calendarioGerado, setCalendarioGerado] = useState<CalendarioGerado | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [sbResults, setSbResults] = useState<AlunoViewRow[]>([]);
+  const [sbLoading, setSbLoading] = useState(false);
+  const [empresaNomeExterno, setEmpresaNomeExterno] = useState<string | null>(null);
+  const [contratoFim, setContratoFim] = useState<string | null>(null);
   const { toast } = useToast();
   const { feriados } = useFeriadosMultiAno();
   const { trilhas } = useTrilhas();
