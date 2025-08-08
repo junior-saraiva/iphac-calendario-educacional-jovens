@@ -114,19 +114,19 @@ export function CalendarioVisualizer({ calendario }: CalendarioVisualizerProps) 
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded bg-green-500"></div>
+              <div className="w-4 h-4 rounded bg-green-500" aria-label="Aula Teórica - marcação"></div>
               <span className="text-sm">Aula Teórica</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded bg-blue-500"></div>
+              <div className="w-4 h-4 rounded bg-blue-500" aria-label="Atividade Prática - marcação"></div>
               <span className="text-sm">Prática na Empresa</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded bg-red-500"></div>
+              <div className="w-4 h-4 rounded bg-red-500" aria-label="Feriado - marcação"></div>
               <span className="text-sm">Feriado</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded bg-yellow-500"></div>
+              <div className="w-4 h-4 rounded bg-yellow-500" aria-label="Férias - marcação"></div>
               <span className="text-sm">Férias</span>
             </div>
           </div>

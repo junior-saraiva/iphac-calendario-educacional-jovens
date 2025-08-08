@@ -31,6 +31,8 @@ export function Layout() {
     { icon: Calendar, label: 'Feriados', path: '/feriados' },
     { icon: CalendarDays, label: 'Gerar Calendário', path: '/calendario' },
     { icon: FileText, label: 'Consultar PDFs', path: '/consulta' },
+    { icon: Settings, label: 'Configurações', path: '/configuracoes' },
+    { icon: ListTree, label: 'Logs', path: '/logs' },
   ];
 
   return (
@@ -55,7 +57,7 @@ export function Layout() {
                 {user?.perfil}
               </p>
             </div>
-            <Button variant="outline" size="sm" onClick={handleLogout} className="hover:bg-destructive hover:text-destructive-foreground transition-colors">
+            <Button variant="outline" size="sm" onClick={handleLogout} className="hover:bg-destructive hover:text-destructive-foreground transition-colors" aria-label="Sair">
               <LogOut className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Sair</span>
             </Button>

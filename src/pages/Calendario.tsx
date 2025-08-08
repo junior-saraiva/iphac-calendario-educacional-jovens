@@ -52,12 +52,50 @@ export function Calendario() {
            aluno.matricula.includes(searchTerm);
   });
 
+  // Busca na VIEW por RA/CPF/Nome
+  useEffect(() => {
+    if (!searchTerm || searchTerm.length < 3) {
+      setSbResults([]);
+      return;
+    }
+    setSbLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const rows = await searchAlunosView(searchTerm);
+        setSbResults(rows);
+        logEvent('info', 'calendario', 'VIEW resultados', { term: searchTerm, qtd: rows.length });
+      } catch (e: any) {
+        logEvent('error', 'calendario', 'Erro na VIEW', { erro: e?.message });
+      } finally {
+        setSbLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
+
+  const handleAlunoSelectFromView = (row: AlunoViewRow) => {
+    const cpfClean = (row.cpf || '').replace(/\D/g, '');
+    const match = mockAlunos.find(a => a.matricula === row.ra || a.cpf.replace(/\D/g, '') === cpfClean);
+    if (match) {
+      setSelectedAluno(match);
+      setSearchTerm(match.nome);
+      toast({ title: 'Aluno carregado', description: 'Dados vinculados ao cadastro local.' });
+    } else {
+      setSelectedAluno(null);
+      setSearchTerm(row.nome);
+      toast({ title: 'Dados carregados da VIEW', description: 'Selecione o aluno correspondente na lista local para gerar.' });
+    }
+    if (row.dtinicio) setDataInicio(row.dtinicio.slice(0,10));
+    setContratoFim(row.dtfim ? row.dtfim.slice(0,10) : null);
+    setEmpresaNomeExterno(row.resfinanceiro || null);
+    logEvent('info', 'calendario', 'Selecionou da VIEW', { ra: row.ra });
+  };
+
   const handleAlunoSelect = (alunoId: string) => {
     const aluno = mockAlunos.find(a => a.id === alunoId);
     setSelectedAluno(aluno || null);
     setSearchTerm(aluno?.nome || '');
   };
-
   const handleGerarCalendario = async () => {
     if (!selectedAluno || !dataInicio || !feriasInicio) {
       toast({
@@ -176,6 +214,26 @@ export function Calendario() {
                     </CardContent>
                   </Card>
                 )}
+
+                {searchTerm && sbResults.length > 0 && !selectedAluno && (
+                  <Card className="mt-2">
+                    <CardContent className="p-2 max-h-60 overflow-y-auto">
+                      <div className="px-2 py-1 text-xs text-muted-foreground">Resultados IPHAC (VIEW)</div>
+                      {sbResults.map((r) => (
+                        <div
+                          key={`${r.ra}-${r.disciplina}-${r.ch}-${r.cpf}`}
+                          className="p-3 hover:bg-accent rounded-md cursor-pointer transition-colors"
+                          onClick={() => handleAlunoSelectFromView(r)}
+                        >
+                          <div className="font-medium">{r.nome}</div>
+                          <div className="text-sm text-muted-foreground">
+                            RA {r.ra} • CPF {r.cpf} • {r.resfinanceiro || 'Empresa não informada'}
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
               </div>
 
               {/* Datas */}
@@ -204,6 +262,11 @@ export function Calendario() {
                     <div className="text-sm">
                       <strong>Data Final:</strong> {new Date(new Date(dataInicio).setMonth(new Date(dataInicio).getMonth() + 24)).toLocaleDateString('pt-BR')}
                     </div>
+                    {contratoFim && (
+                      <div className="text-sm">
+                        <strong>Data Final (VIEW):</strong> {new Date(contratoFim).toLocaleDateString('pt-BR')}
+                      </div>
+                    )}
                     <div className="text-sm text-muted-foreground">
                       24 meses (máximo legal)
                     </div>
