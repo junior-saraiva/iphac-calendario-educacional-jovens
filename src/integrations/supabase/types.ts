@@ -14,10 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alunos_view_cache: {
+        Row: {
+          ch: number | null
+          cidade: string | null
+          codturma: string | null
+          cpf: string | null
+          created_at: string
+          curso: string | null
+          disciplina: string | null
+          dtfim: string | null
+          dtinicio: string | null
+          id: string
+          nome: string
+          ra: string
+          resfinanceiro: string | null
+          updated_at: string
+        }
+        Insert: {
+          ch?: number | null
+          cidade?: string | null
+          codturma?: string | null
+          cpf?: string | null
+          created_at?: string
+          curso?: string | null
+          disciplina?: string | null
+          dtfim?: string | null
+          dtinicio?: string | null
+          id?: string
+          nome: string
+          ra: string
+          resfinanceiro?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ch?: number | null
+          cidade?: string | null
+          codturma?: string | null
+          cpf?: string | null
+          created_at?: string
+          curso?: string | null
+          disciplina?: string | null
+          dtfim?: string | null
+          dtinicio?: string | null
+          id?: string
+          nome?: string
+          ra?: string
+          resfinanceiro?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      VW_DADOS_ALUNOS_DISCIPLINAS_ATIVOS: {
+        Row: {
+          CH: number | null
+          CIDADE: string | null
+          CODTURMA: string | null
+          CPF: string | null
+          CURSO: string | null
+          DISCIPLINA: string | null
+          DTFIM: string | null
+          DTINICIO: string | null
+          NOME: string | null
+          RA: string | null
+          RESFINCEIRO: string | null
+        }
+        Insert: {
+          CH?: number | null
+          CIDADE?: string | null
+          CODTURMA?: string | null
+          CPF?: string | null
+          CURSO?: string | null
+          DISCIPLINA?: string | null
+          DTFIM?: string | null
+          DTINICIO?: string | null
+          NOME?: string | null
+          RA?: string | null
+          RESFINCEIRO?: string | null
+        }
+        Update: {
+          CH?: number | null
+          CIDADE?: string | null
+          CODTURMA?: string | null
+          CPF?: string | null
+          CURSO?: string | null
+          DISCIPLINA?: string | null
+          DTFIM?: string | null
+          DTINICIO?: string | null
+          NOME?: string | null
+          RA?: string | null
+          RESFINCEIRO?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
