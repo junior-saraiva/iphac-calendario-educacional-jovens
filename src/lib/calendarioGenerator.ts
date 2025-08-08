@@ -6,6 +6,7 @@ import { ValidadorCalendario } from './calendario/validacoes';
 
 import { addDays, format } from 'date-fns';
 import { GeradorFeriados } from './calendario/geradorFeriados';
+import { GeradorPraticas } from './calendario/geradorPraticas';
 
 export class CalendarioGenerator {
   private static feriados: Feriado[] = [];
@@ -114,10 +115,21 @@ export class CalendarioGenerator {
     );
     console.log(`[CALENDARIO] Gerados ${eventosAulas.length} eventos de aulas baseados em disciplinas`);
 
+    // Gerar dias práticos nos 4 dias úteis restantes por semana (respeitando feriados e férias)
+    const eventosPraticas = GeradorPraticas.gerarDiasPraticos(
+      dataInicioAjustada,
+      dataFim,
+      aluno.dia_aula_semana,
+      this.feriados,
+      [...eventosFerias, ...eventosAulas]
+    );
+    console.log(`[CALENDARIO] Gerados ${eventosPraticas.length} eventos de práticas`);
+
     // Combinar todos os eventos
     const todosEventos = [
       ...eventosFerias,
-      ...eventosAulas
+      ...eventosAulas,
+      ...eventosPraticas
     ];
 
     // Gerar resumo das trilhas
@@ -128,11 +140,10 @@ export class CalendarioGenerator {
       this.trilhas
     );
 
-    // Filtrar feriados pelo ano da data de início
-    const anoInicio = dataInicioAjustada.getFullYear();
-    const feriadosDoAno = this.feriados.filter(feriado => {
-      const anoFeriado = new Date(feriado.data).getFullYear();
-      return anoFeriado === anoInicio;
+    // Selecionar feriados no período do calendário (multi-ano)
+    const feriadosNoPeriodo = this.feriados.filter(feriado => {
+      const dataF = new Date(feriado.data);
+      return dataF >= dataInicioAjustada && dataF <= dataFim;
     });
 
     // Adicionar feriados por localização (priorizar cidade da empresa)
@@ -143,7 +154,7 @@ export class CalendarioGenerator {
         dataFim, 
         aluno, 
         polo, 
-        feriadosDoAno,
+        feriadosNoPeriodo,
         empresaInfo
       );
       todosEventos.push(...feriadosEventos);
