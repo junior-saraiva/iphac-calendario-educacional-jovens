@@ -16,13 +16,18 @@ const corsHeaders = {
 };
 
 // Schema de entrada
+// Schema de entrada: aceita years[] OU range start/end; valida 2025..2030
 const InputSchema = z.object({
-  start_year: z.number().int().gte(2000).lte(2100),
-  end_year: z.number().int().gte(2000).lte(2100),
+  years: z.array(z.number().int().gte(2025).lte(2030)).min(1).optional(),
+  start_year: z.number().int().gte(2025).lte(2030).optional(),
+  end_year: z.number().int().gte(2025).lte(2030).optional(),
   scope: z.enum(["nacional", "estadual", "municipal", "facultativo"]),
   uf: z.string().optional(),
   ibge_code: z.union([z.string(), z.number()]).optional(),
-});
+}).refine(
+  (d) => (Array.isArray(d.years) && d.years.length > 0) || (typeof d.start_year === "number" && typeof d.end_year === "number"),
+  { message: "Provide years[] or start_year/end_year" }
+);
 
 type Input = z.infer<typeof InputSchema>;
 
@@ -162,7 +167,7 @@ Deno.serve(async (req) => {
       );
     }
     const input = parsed.data;
-    const years = expandYears(input.start_year, input.end_year);
+    const years = input.years ?? expandYears(input.start_year!, input.end_year!);
 
     // Autenticação e autorização: exige admin
     const { data: auth, error: authErr } = await client.auth.getUser();
@@ -264,8 +269,7 @@ Deno.serve(async (req) => {
         const { data: upsertData, error: upsertErr } = await client
           .from("feriado")
           .upsert(batch, {
-            ignoreDuplicates: false,
-            onConflict: "data, coalesce(uf,''), coalesce(ibge_code,0), tipo",
+            onConflict: "data,uf,ibge_code,tipo",
           });
 
         metrics.totals.processed += batch.length;
