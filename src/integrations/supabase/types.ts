@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      alunos_raw_import_json: {
+        Row: {
+          id: string
+          imported_at: string
+          payload: Json
+        }
+        Insert: {
+          id?: string
+          imported_at?: string
+          payload: Json
+        }
+        Update: {
+          id?: string
+          imported_at?: string
+          payload?: Json
+        }
+        Relationships: []
+      }
       alunos_view_cache: {
         Row: {
           ch: number | null
@@ -111,7 +129,18 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      parse_date_safe: {
+        Args: { _s: string }
+        Returns: string
+      }
+      parse_int_safe: {
+        Args: { _s: string }
+        Returns: number
+      }
+      refresh_alunos_cache_from_raw_json: {
+        Args: { full_refresh?: boolean }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
