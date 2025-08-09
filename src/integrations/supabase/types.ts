@@ -83,6 +83,87 @@ export type Database = {
         }
         Relationships: []
       }
+      feriado: {
+        Row: {
+          ano: number | null
+          created_at: string
+          data: string
+          descricao: string | null
+          ibge_code: string | null
+          id: string
+          nome: string | null
+          tipo: string
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          ano?: number | null
+          created_at?: string
+          data: string
+          descricao?: string | null
+          ibge_code?: string | null
+          id?: string
+          nome?: string | null
+          tipo: string
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ano?: number | null
+          created_at?: string
+          data?: string
+          descricao?: string | null
+          ibge_code?: string | null
+          id?: string
+          nome?: string | null
+          tipo?: string
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      import_run: {
+        Row: {
+          created_at: string
+          ibge_code: string | null
+          id: string
+          metrics: Json | null
+          payload: Json | null
+          scope: string
+          status: string
+          uf: string | null
+          updated_at: string
+          user_id: string | null
+          years: number[]
+        }
+        Insert: {
+          created_at?: string
+          ibge_code?: string | null
+          id?: string
+          metrics?: Json | null
+          payload?: Json | null
+          scope: string
+          status?: string
+          uf?: string | null
+          updated_at?: string
+          user_id?: string | null
+          years: number[]
+        }
+        Update: {
+          created_at?: string
+          ibge_code?: string | null
+          id?: string
+          metrics?: Json | null
+          payload?: Json | null
+          scope?: string
+          status?: string
+          uf?: string | null
+          updated_at?: string
+          user_id?: string | null
+          years?: number[]
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
