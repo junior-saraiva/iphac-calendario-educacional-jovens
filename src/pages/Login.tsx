@@ -74,14 +74,6 @@ export default function Login() {
             </Button>
           </form>
           
-          <div className="mt-6 p-4 bg-muted rounded-lg">
-            <p className="text-xs text-muted-foreground mb-2">Usuários de teste:</p>
-            <div className="text-xs space-y-1">
-              <div>Admin: admin@sistema.com / 123456</div>
-              <div>Operador: operador@sistema.com / 123456</div>
-              <div>Consulta: consulta@sistema.com / 123456</div>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

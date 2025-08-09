@@ -1,198 +1,103 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
-import { mockAlunos, mockTurmas, mockEmpresas } from '@/data/mockData';
-import { AlunoForm } from '@/components/AlunoForm';
-import { Aluno } from '@/types';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { AlunoViewRow, searchAlunosView } from '@/integrations/supabase/queries/alunosView';
 
 export function Alunos() {
-  const [alunos, setAlunos] = useState(mockAlunos);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingAluno, setEditingAluno] = useState<Aluno | null>(null);
   const { toast } = useToast();
+  const [term, setTerm] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState<AlunoViewRow[]>([]);
 
-  const normalizeString = (str: string) => {
-    return str
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-  };
+  useEffect(() => {
+    if (term.trim().length < 3) {
+      setRows([]);
+      return;
+    }
+    setLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const data = await searchAlunosView(term.trim());
+        setRows(data);
+      } catch (e: any) {
+        toast({
+          variant: 'destructive',
+          title: 'Erro na busca',
+          description: e?.message ?? 'Falha ao consultar alunos.'
+        });
+      } finally {
+        setLoading(false);
+      }
+    }, 350);
+    return () => clearTimeout(t);
+  }, [term, toast]);
 
-  const filteredAlunos = alunos.filter(aluno => {
-    const normalizedSearchTerm = normalizeString(searchTerm);
-    return normalizeString(aluno.nome).includes(normalizedSearchTerm) ||
-           aluno.cpf.includes(searchTerm) ||
-           aluno.matricula.includes(searchTerm);
-  });
-
-  const handleCreateAluno = (data: Omit<Aluno, 'id'>) => {
-    const newAluno: Aluno = {
-      ...data,
-      id: (Math.max(...alunos.map(a => parseInt(a.id))) + 1).toString()
-    };
-    setAlunos([...alunos, newAluno]);
-    setIsDialogOpen(false);
-    toast({
-      title: "Aluno cadastrado",
-      description: "Aluno cadastrado com sucesso.",
-    });
-  };
-
-  const handleUpdateAluno = (data: Omit<Aluno, 'id'>) => {
-    if (!editingAluno) return;
-    
-    const updatedAlunos = alunos.map(aluno => 
-      aluno.id === editingAluno.id ? { ...data, id: editingAluno.id } : aluno
-    );
-    setAlunos(updatedAlunos);
-    setEditingAluno(null);
-    setIsDialogOpen(false);
-    toast({
-      title: "Aluno atualizado",
-      description: "Dados do aluno atualizados com sucesso.",
-    });
-  };
-
-  const handleDeleteAluno = (id: string) => {
-    setAlunos(alunos.filter(aluno => aluno.id !== id));
-    toast({
-      title: "Aluno removido",
-      description: "Aluno removido com sucesso.",
-    });
-  };
-
-  const handleEditClick = (aluno: Aluno) => {
-    setEditingAluno(aluno);
-    setIsDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setTimeout(() => setEditingAluno(null), 100);
-  };
-
-  const getTurmaNome = (turmaId: string) => {
-    return mockTurmas.find(t => t.id === turmaId)?.nome || 'N/A';
-  };
-
-  const getEmpresaNome = (empresaId: string) => {
-    return mockEmpresas.find(e => e.id === empresaId)?.nome || 'N/A';
-  };
+  const info = useMemo(() => {
+    if (term.trim().length === 0) return 'Digite ao menos 3 caracteres para buscar.';
+    if (term.trim().length > 0 && term.trim().length < 3) return 'Mínimo de 3 caracteres.';
+    if (loading) return 'Buscando...';
+    if (!loading && rows.length === 0) return 'Nenhum resultado.';
+    return `${rows.length} resultado(s)`;
+  }, [term, loading, rows.length]);
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-foreground">Alunos</h1>
-        <Dialog open={isDialogOpen} onOpenChange={(open) => {
-          setIsDialogOpen(open);
-          if (!open) setEditingAluno(null);
-        }}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Novo Aluno
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                {editingAluno ? 'Editar Aluno' : 'Cadastrar Novo Aluno'}
-              </DialogTitle>
-            </DialogHeader>
-            <AlunoForm
-              aluno={editingAluno}
-              onSubmit={editingAluno ? handleUpdateAluno : handleCreateAluno}
-              onCancel={handleDialogClose}
-            />
-          </DialogContent>
-        </Dialog>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-foreground">Consulta de Alunos (VIEW)</h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Alunos</CardTitle>
-          <div className="flex items-center space-x-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
+          <CardTitle>Buscar</CardTitle>
+          <div className="relative max-w-xl">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por nome, CPF ou matrícula..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
+              placeholder="RA, CPF ou Nome (mín. 3 caracteres)"
+              className="pl-10"
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}
             />
+            <div className="text-xs text-muted-foreground mt-2">{info}</div>
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>CPF</TableHead>
-                <TableHead>Matrícula</TableHead>
-                <TableHead>Turma</TableHead>
-                <TableHead>Empresa</TableHead>
-                <TableHead>Curso</TableHead>
-                <TableHead>Turno</TableHead>
-                <TableHead>Dia da Semana</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAlunos.map((aluno) => (
-                <TableRow key={aluno.id}>
-                  <TableCell className="font-medium">{aluno.nome}</TableCell>
-                  <TableCell>{aluno.cpf}</TableCell>
-                  <TableCell>{aluno.matricula}</TableCell>
-                  <TableCell>{getTurmaNome(aluno.turma_id)}</TableCell>
-                  <TableCell>{getEmpresaNome(aluno.empresa_id)}</TableCell>
-                  <TableCell>{aluno.curso}</TableCell>
-                  <TableCell>{aluno.turno}</TableCell>
-                  <TableCell>{aluno.dia_aula_semana}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditClick(aluno)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeleteAluno(aluno.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>RA</TableHead>
+                  <TableHead>CPF</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Curso</TableHead>
+                  <TableHead>Cidade</TableHead>
+                  <TableHead>CodTurma</TableHead>
+                  <TableHead>Disciplina</TableHead>
+                  <TableHead>CH</TableHead>
+                  <TableHead>Início</TableHead>
+                  <TableHead>Fim</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          {filteredAlunos.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              Nenhum aluno encontrado.
-            </div>
-          )}
+              </TableHeader>
+              <TableBody>
+                {rows.map((r, i) => (
+                  <TableRow key={`${r.ra}-${r.disciplina}-${i}`}>
+                    <TableCell className="font-medium">{r.ra}</TableCell>
+                    <TableCell>{r.cpf ?? '—'}</TableCell>
+                    <TableCell>{r.nome}</TableCell>
+                    <TableCell>{r.curso ?? '—'}</TableCell>
+                    <TableCell>{r.cidade ?? '—'}</TableCell>
+                    <TableCell>{r.codturma ?? '—'}</TableCell>
+                    <TableCell>{r.disciplina ?? '—'}</TableCell>
+                    <TableCell>{r.ch ?? '—'}</TableCell>
+                    <TableCell>{r.dtinicio ? new Date(r.dtinicio).toLocaleDateString('pt-BR') : '—'}</TableCell>
+                    <TableCell>{r.dtfim ? new Date(r.dtfim).toLocaleDateString('pt-BR') : '—'}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

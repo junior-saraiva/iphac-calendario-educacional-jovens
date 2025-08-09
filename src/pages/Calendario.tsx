@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CalendarioVisualizer } from '@/components/CalendarioVisualizer';
 import { CalendarioGenerator } from '@/lib/calendarioGenerator';
 import { Search, Calendar as CalendarIcon, Users } from 'lucide-react';
-import { mockAlunos, mockEmpresas, mockTurmas, mockPolos } from '@/data/mockData';
+
 import { useToast } from '@/hooks/use-toast';
 import { useFeriadosMultiAno } from '@/hooks/useFeriadosMultiAno';
 import { useTrilhas } from '@/hooks/useTrilhas';
@@ -26,6 +26,8 @@ export function Calendario() {
   const [sbLoading, setSbLoading] = useState(false);
   const [empresaNomeExterno, setEmpresaNomeExterno] = useState<string | null>(null);
   const [contratoFim, setContratoFim] = useState<string | null>(null);
+  const [turno, setTurno] = useState<'Manhã' | 'Tarde' | 'Noite' | ''>('');
+  const [diaSemana, setDiaSemana] = useState<'Segunda' | 'Terça' | 'Quarta' | 'Quinta' | 'Sexta' | ''>('');
   const { toast } = useToast();
   const { feriados } = useFeriadosMultiAno();
   const { trilhas } = useTrilhas();
@@ -34,23 +36,8 @@ export function Calendario() {
   useEffect(() => {
     CalendarioGenerator.setFeriados(feriados);
     CalendarioGenerator.setTrilhas(trilhas);
-    CalendarioGenerator.setPolos(mockPolos);
-    CalendarioGenerator.setEmpresas(mockEmpresas);
   }, [feriados, trilhas]);
 
-  const normalizeString = (str: string) => {
-    return str
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-  };
-
-  const filteredAlunos = mockAlunos.filter(aluno => {
-    const normalizedSearchTerm = normalizeString(searchTerm);
-    return normalizeString(aluno.nome).includes(normalizedSearchTerm) ||
-           aluno.cpf.includes(searchTerm) ||
-           aluno.matricula.includes(searchTerm);
-  });
 
   // Busca na VIEW por RA/CPF/Nome
   useEffect(() => {
@@ -74,28 +61,28 @@ export function Calendario() {
   }, [searchTerm]);
 
   const handleAlunoSelectFromView = (row: AlunoViewRow) => {
-    const cpfClean = (row.cpf || '').replace(/\D/g, '');
-    const match = mockAlunos.find(a => a.matricula === row.ra || a.cpf.replace(/\D/g, '') === cpfClean);
-    if (match) {
-      setSelectedAluno(match);
-      setSearchTerm(match.nome);
-      toast({ title: 'Aluno carregado', description: 'Dados vinculados ao cadastro local.' });
-    } else {
-      setSelectedAluno(null);
-      setSearchTerm(row.nome);
-      toast({ title: 'Dados carregados da VIEW', description: 'Selecione o aluno correspondente na lista local para gerar.' });
-    }
+    setSearchTerm(row.nome);
     if (row.dtinicio) setDataInicio(row.dtinicio.slice(0,10));
     setContratoFim(row.dtfim ? row.dtfim.slice(0,10) : null);
     setEmpresaNomeExterno(row.resfinanceiro || null);
+
+    const alunoMin: Aluno = {
+      id: row.ra || (row.cpf || 'sem-id'),
+      nome: row.nome,
+      cpf: row.cpf || '',
+      matricula: row.ra || '',
+      turma_id: row.codturma || '',
+      empresa_id: '',
+      polo_id: '',
+      curso: row.curso || '',
+      turno: turno || '',
+      dia_aula_semana: diaSemana || 'Segunda'
+    } as Aluno;
+
+    setSelectedAluno(alunoMin);
     logEvent('info', 'calendario', 'Selecionou da VIEW', { ra: row.ra });
   };
 
-  const handleAlunoSelect = (alunoId: string) => {
-    const aluno = mockAlunos.find(a => a.id === alunoId);
-    setSelectedAluno(aluno || null);
-    setSearchTerm(aluno?.nome || '');
-  };
   const handleGerarCalendario = async () => {
     if (!selectedAluno || !dataInicio || !feriasInicio) {
       toast({
@@ -113,14 +100,15 @@ export function Calendario() {
       
       // Calcular data fim automaticamente (24 meses a partir da data de início)
       const dataFim = new Date(dataInicioDate);
-      dataFim.setMonth(dataFim.getMonth() + 24); // Exatamente 24 meses
+      dataFim.setMonth(dataFim.getMonth() + 24);
 
-      // Atualizar feriados e trilhas no gerador antes de gerar o calendário
       CalendarioGenerator.setFeriados(feriados);
       CalendarioGenerator.setTrilhas(trilhas);
 
+      const alunoParaGerar: Aluno = { ...selectedAluno!, turno: turno as any, dia_aula_semana: diaSemana as any };
+
       const calendario = CalendarioGenerator.gerarCalendario(
-        selectedAluno,
+        alunoParaGerar,
         dataInicioDate,
         dataFim,
         feriasInicioDate
@@ -196,24 +184,6 @@ export function Calendario() {
                   />
                 </div>
                 
-                {searchTerm && filteredAlunos.length > 0 && !selectedAluno && (
-                  <Card className="mt-2">
-                    <CardContent className="p-2 max-h-60 overflow-y-auto">
-                      {filteredAlunos.map((aluno) => (
-                        <div
-                          key={aluno.id}
-                          className="p-3 hover:bg-accent rounded-md cursor-pointer transition-colors"
-                          onClick={() => handleAlunoSelect(aluno.id)}
-                        >
-                          <div className="font-medium">{aluno.nome}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {aluno.matricula} • {aluno.cpf}
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                )}
 
                 {searchTerm && sbResults.length > 0 && !selectedAluno && (
                   <Card className="mt-2">
@@ -236,7 +206,7 @@ export function Calendario() {
                 )}
               </div>
 
-              {/* Datas */}
+               {/* Campos adicionais */}
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="dataInicio">Data de Início</Label>

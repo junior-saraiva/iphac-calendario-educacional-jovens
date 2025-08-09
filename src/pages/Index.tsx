@@ -6,7 +6,7 @@ import { Badge } from '../components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useFeriados } from '@/hooks/useFeriados';
 import { useTrilhas } from '@/hooks/useTrilhas';
-import { mockAlunos } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   Calendar, 
   Users, 
@@ -27,30 +27,47 @@ const Index = () => {
   const { trilhas } = useTrilhas();
   const [calendarioGerados, setCalendarioGerados] = useState(0);
   const [setupProgress, setSetupProgress] = useState(0);
-
-  // Calcular estatísticas reais
+  const [alunosCount, setAlunosCount] = useState<number | null>(null);
+  // Carregar PDFs gerados e contar alunos reais via Supabase
   useEffect(() => {
-    // Simular PDFs gerados baseado no localStorage
     const savedPDFs = localStorage.getItem('calendarios_gerados');
-    setCalendarioGerados(savedPDFs ? JSON.parse(savedPDFs).length : 0);
+    const qtdPDFs = savedPDFs ? JSON.parse(savedPDFs).length : 0;
+    setCalendarioGerados(qtdPDFs);
 
-    // Calcular progresso do setup
-    let progress = 0;
-    if (mockAlunos.length > 0) progress += 25;
-    if (trilhas.length > 0) progress += 25;
-    if (feriados.length > 0) progress += 25;
-    if (calendarioGerados > 0) progress += 25;
-    setSetupProgress(progress);
-  }, [trilhas.length, feriados.length, calendarioGerados]);
+    const calcularProgresso = (alunosC: number | null) => {
+      let progress = 0;
+      if (alunosC && alunosC > 0) progress += 25;
+      if (trilhas.length > 0) progress += 25;
+      if (feriados.length > 0) progress += 25;
+      if (qtdPDFs > 0) progress += 25;
+      setSetupProgress(progress);
+    };
+
+    const fetchCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('alunos_view_cache')
+          .select('*', { count: 'exact', head: true });
+        if (error) throw error;
+        setAlunosCount(count ?? 0);
+        calcularProgresso(count ?? 0);
+      } catch (e) {
+        setAlunosCount(null);
+        calcularProgresso(null);
+      }
+    };
+
+    fetchCount();
+  }, [trilhas.length, feriados.length]);
 
   const stats = [
     { 
       title: 'Alunos Cadastrados', 
-      value: mockAlunos.length.toString(), 
+      value: alunosCount !== null ? alunosCount.toString() : '—', 
       icon: Users, 
       color: 'text-blue-600',
-      change: '+2 esta semana',
-      changeType: 'positive' as const
+      change: alunosCount !== null ? 'contagem real' : 'acesso restrito',
+      changeType: alunosCount !== null ? 'neutral' as const : 'warning' as const
     },
     { 
       title: 'Trilhas Ativas', 
@@ -89,10 +106,10 @@ const Index = () => {
 
   const taskList = [
     {
-      title: 'Cadastrar alunos e empresas',
-      completed: mockAlunos.length > 0,
+      title: 'Consultar alunos (VIEW)',
+      completed: alunosCount !== null ? alunosCount > 0 : false,
       link: '/alunos',
-      description: 'Configure os dados básicos dos alunos'
+      description: 'Pesquisar alunos (dados reais)'
     },
     {
       title: 'Configurar trilhas e disciplinas',
@@ -330,9 +347,9 @@ const Index = () => {
             <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2" asChild>
               <Link to="/alunos">
                 <Users className="h-6 w-6 text-primary" />
-                <span className="font-medium">Cadastrar Aluno</span>
+                <span className="font-medium">Consultar Alunos</span>
                 <span className="text-xs text-muted-foreground text-center">
-                  Adicionar novo aluno ao sistema
+                  Pesquisar e visualizar alunos (VIEW)
                 </span>
               </Link>
             </Button>
