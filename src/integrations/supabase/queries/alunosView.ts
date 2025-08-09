@@ -14,47 +14,18 @@ export interface AlunoViewRow {
   ch: number | null;
 }
 
-const VIEW_NAME = "VW_DADOS_ALUNOS_DISCIPLINAS_ATIVOS";
-const SELECT_ALUNO = [
-  "ra:RA",
-  "cpf:CPF",
-  "nome:NOME",
-  "dtinicio:DTINICIO",
-  "dtfim:DTFIM",
-  "cidade:CIDADE",
-  "resfinanceiro:RESFINCEIRO",
-  "curso:CURSO",
-  "codturma:CODTURMA",
-  "disciplina:DISCIPLINA",
-  "ch:CH",
-].join(", ");
-
+/**
+ * Secure search via RPC that enforces RBAC and masks CPF for consulta role.
+ */
 export async function searchAlunosView(term: string) {
-  // Busca por RA, CPF ou Nome (ilike)
-  const q = (supabase as any)
-    .from(VIEW_NAME)
-    .select(SELECT_ALUNO)
-    .or(
-      [
-        `RA.ilike.%${term}%`,
-        `CPF.ilike.%${term}%`,
-        `NOME.ilike.%${term}%`,
-      ].join(",")
-    )
-    .limit(25);
-
-  const { data, error } = await q;
+  const { data, error } = await (supabase as any).rpc("search_alunos", { term });
   if (error) throw error;
-
-  // Tipar a saída
   return (data as unknown as AlunoViewRow[]) || [];
 }
 
 export async function testViewConnection() {
-  const { data, error } = await (supabase as any)
-    .from(VIEW_NAME)
-    .select("RA")
-    .limit(1);
+  // Minimal search term length is 3 (enforced in RPC)
+  const { data, error } = await (supabase as any).rpc("search_alunos", { term: "AAA" });
   if (error) throw error;
   return data?.length ?? 0;
 }

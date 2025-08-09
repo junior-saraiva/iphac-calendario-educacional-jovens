@@ -83,6 +83,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       VW_DADOS_ALUNOS_DISCIPLINAS_ATIVOS: {
@@ -129,6 +150,13 @@ export type Database = {
       }
     }
     Functions: {
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
       parse_date_safe: {
         Args: { _s: string }
         Returns: string
@@ -141,9 +169,25 @@ export type Database = {
         Args: { full_refresh?: boolean }
         Returns: number
       }
+      search_alunos: {
+        Args: { term: string }
+        Returns: {
+          ra: string
+          cpf: string
+          nome: string
+          dtinicio: string
+          dtfim: string
+          cidade: string
+          resfinanceiro: string
+          curso: string
+          codturma: string
+          disciplina: string
+          ch: number
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "operador" | "consulta"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -270,6 +314,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "operador", "consulta"],
+    },
   },
 } as const
