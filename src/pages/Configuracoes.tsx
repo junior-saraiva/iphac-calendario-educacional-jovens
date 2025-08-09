@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { testViewConnection } from '@/integrations/supabase/queries/alunosView';
 import { logEvent } from '@/lib/logs';
 import { ServerCog, CheckCircle2, AlertTriangle, Database } from 'lucide-react';
+import ImportadorCSV from '@/components/ImportadorCSV';
 
 export default function Configuracoes() {
   const { toast } = useToast();
@@ -73,6 +74,8 @@ export default function Configuracoes() {
           </div>
         </CardContent>
       </Card>
+
+      <ImportadorCSV />
     </div>
   );
 }
