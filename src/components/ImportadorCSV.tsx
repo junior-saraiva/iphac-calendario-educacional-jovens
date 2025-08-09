@@ -61,6 +61,36 @@ function autoMap(headers: string[]) {
   return map;
 }
 
+// Sanitiza cabeçalhos vazios/duplicados e reatribui linhas para usar os nomes sanitizados
+function sanitizeHeadersAndRows(rawHeaders: string[], rows: any[]): { headers: string[]; rows: Record<string, any>[] } {
+  const headers: string[] = [];
+  const counts: Record<string, number> = {};
+
+  const getUnique = (base: string) => {
+    const b = base || "COL";
+    counts[b] = (counts[b] || 0) + 1;
+    return counts[b] === 1 ? b : `${b}_${counts[b]}`;
+  };
+
+  rawHeaders.forEach((h, idx) => {
+    const trimmed = (h ?? "").toString().trim();
+    const base = trimmed ? trimmed : `COL_${idx + 1}`;
+    const norm = base.replace(/\s+/g, "_");
+    headers.push(getUnique(norm));
+  });
+
+  const outRows = rows.map((r) => {
+    const o: Record<string, any> = {};
+    rawHeaders.forEach((raw, idx) => {
+      const key = headers[idx];
+      o[key] = r[raw];
+    });
+    return o;
+  });
+
+  return { headers, rows: outRows };
+}
+
 interface ParsedCsv {
   headers: string[];
   rows: Record<string, any>[]; // com chaves iguais aos headers originais
@@ -93,18 +123,22 @@ export default function ImportadorCSV() {
         complete: (results) => {
           try {
             const rows: any[] = results.data as any[];
-            const headers: string[] = hasHeader
-              ? (results.meta.fields as string[])
-              : // quando não há cabeçalho, criaremos índices H1, H2...
-                Array.from({ length: (rows[0] as any[])?.length || 0 }, (_, i) => `COL_${i + 1}`);
+            let headers: string[] = [];
+            let normalizedRows: Record<string, any>[] = [];
 
-            const normalizedRows: Record<string, any>[] = hasHeader
-              ? rows
-              : rows.map((arr) => {
-                  const obj: Record<string, any> = {};
-                  headers.forEach((h, i) => (obj[h] = (arr as any[])[i]));
-                  return obj;
-                });
+            if (hasHeader) {
+              const rawHeaders: string[] = (results.meta.fields as string[]) || [];
+              const sanitized = sanitizeHeadersAndRows(rawHeaders, rows);
+              headers = sanitized.headers;
+              normalizedRows = sanitized.rows;
+            } else {
+              headers = Array.from({ length: (rows[0] as any[])?.length || 0 }, (_, i) => `COL_${i + 1}`);
+              normalizedRows = rows.map((arr) => {
+                const obj: Record<string, any> = {};
+                headers.forEach((h, i) => (obj[h] = (arr as any[])[i]));
+                return obj;
+              });
+            }
 
             setParsed({ headers, rows: normalizedRows });
             setMapping(autoMap(headers));
