@@ -140,17 +140,11 @@ export function Calendario() {
     }
   };
 
-  const getEmpresaNome = (empresaId: string) => {
-    return mockEmpresas.find(e => e.id === empresaId)?.nome || 'Não encontrada';
-  };
+  const getEmpresaNome = (empresaId: string) => empresaNomeExterno || empresaId || '—';
 
-  const getTurmaNome = (turmaId: string) => {
-    return mockTurmas.find(t => t.id === turmaId)?.nome || 'Não encontrada';
-  };
+  const getTurmaNome = (turmaId: string) => turmaId || '—';
 
-  const getPoloNome = (poloId: string) => {
-    return mockPolos.find(p => p.id === poloId)?.nome || 'Não encontrado';
-  };
+  const getPoloNome = (poloId: string) => poloId || '—';
 
   return (
     <div className="space-y-6">
