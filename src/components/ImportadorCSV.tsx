@@ -38,6 +38,8 @@ function normalize(s?: string | null) {
     .replace(/[^A-Z0-9_]/g, "");
 }
 
+const NONE_VALUE = "__NONE__";
+
 // Sugere mapeamento automático por similaridade de nomes
 function autoMap(headers: string[]) {
   const map: Record<string, string | null> = {};
@@ -222,14 +224,14 @@ export default function ImportadorCSV() {
                 <div key={f.key} className="space-y-1">
                   <Label className="text-xs">{f.label}</Label>
                   <Select
-                    value={mapping[f.key] || ""}
-                    onValueChange={(v) => setMapping((m) => ({ ...m, [f.key]: v || null }))}
+                    value={mapping[f.key] ?? NONE_VALUE}
+                    onValueChange={(v) => setMapping((m) => ({ ...m, [f.key]: v === NONE_VALUE ? null : v }))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione a coluna" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">(não mapear)</SelectItem>
+                    <SelectContent className="z-50 bg-background">
+                      <SelectItem value={NONE_VALUE}>(não mapear)</SelectItem>
                       {parsed?.headers.map((h) => (
                         <SelectItem key={`${f.key}-${h}`} value={h}>
                           {h}
