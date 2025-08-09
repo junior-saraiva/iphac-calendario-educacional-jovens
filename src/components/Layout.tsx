@@ -31,7 +31,7 @@ export function Layout() {
     { icon: Calendar, label: 'Feriados', path: '/feriados' },
     { icon: CalendarDays, label: 'Gerar Calendário', path: '/calendario' },
     { icon: FileText, label: 'Consultar PDFs', path: '/consulta' },
-    { icon: Settings, label: 'Configurações', path: '/configuracoes' },
+    { icon: Settings, label: 'Admin: Importar Feriados', path: '/admin/feriados' },
     { icon: ListTree, label: 'Logs', path: '/logs' },
   ];
 
