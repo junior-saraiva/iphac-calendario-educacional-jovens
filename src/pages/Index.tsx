@@ -20,6 +20,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import HelpPanel from '@/components/HelpPanel';
 
 const Index = () => {
   const { toast } = useToast();
@@ -65,7 +66,7 @@ const Index = () => {
       title: 'Alunos Cadastrados', 
       value: alunosCount !== null ? alunosCount.toString() : '—', 
       icon: Users, 
-      color: 'text-blue-600',
+      color: 'text-muted-foreground',
       change: alunosCount !== null ? 'contagem real' : 'acesso restrito',
       changeType: alunosCount !== null ? 'neutral' as const : 'warning' as const
     },
@@ -73,7 +74,7 @@ const Index = () => {
       title: 'Trilhas Ativas', 
       value: trilhas.length.toString(), 
       icon: BookOpen, 
-      color: 'text-green-600',
+      color: 'text-muted-foreground',
       change: `${trilhas.reduce((acc, t) => acc + t.disciplinas.length, 0)} disciplinas`,
       changeType: 'neutral' as const
     },
@@ -81,7 +82,7 @@ const Index = () => {
       title: 'Calendários Gerados', 
       value: calendarioGerados.toString(), 
       icon: Calendar, 
-      color: 'text-purple-600',
+      color: 'text-muted-foreground',
       change: calendarioGerados > 0 ? 'Ativos' : 'Aguardando',
       changeType: calendarioGerados > 0 ? 'positive' as const : 'warning' as const
     },
@@ -89,7 +90,7 @@ const Index = () => {
       title: 'Feriados Cadastrados', 
       value: feriados.length.toString(), 
       icon: FileText, 
-      color: 'text-orange-600',
+      color: 'text-muted-foreground',
       change: 'Nacional/Local',
       changeType: 'neutral' as const
     },
@@ -143,6 +144,13 @@ const Index = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <HelpPanel pageKey="dashboard">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Siga o Início Rápido para configurar alunos, trilhas e feriados.</li>
+          <li>Use as Ações Rápidas como atalhos para páginas-chave.</li>
+          <li>Acompanhe o progresso de configuração no cartão de status.</li>
+        </ul>
+      </HelpPanel>
       {/* Header com ação rápida */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>

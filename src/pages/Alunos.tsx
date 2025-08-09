@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AlunoViewRow, searchAlunosView } from '@/integrations/supabase/queries/alunosView';
+import HelpPanel from '@/components/HelpPanel';
 
 export function Alunos() {
   const { toast } = useToast();
@@ -45,6 +46,12 @@ export function Alunos() {
 
   return (
     <div className="space-y-6">
+      <HelpPanel pageKey="alunos">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Digite ao menos 3 caracteres (RA, CPF ou Nome) para buscar.</li>
+          <li>Os resultados são somente leitura a partir da VIEW IPHAC.</li>
+        </ul>
+      </HelpPanel>
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">Consulta de Alunos (VIEW)</h1>
       </div>

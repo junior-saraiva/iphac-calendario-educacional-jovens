@@ -7,6 +7,7 @@ import { Label } from '../components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Calendar } from 'lucide-react';
 import { toast } from 'sonner';
+import HelpPanel from '@/components/HelpPanel';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -40,6 +41,13 @@ export default function Login() {
         </CardHeader>
         
         <CardContent>
+          <HelpPanel pageKey="login">
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Entre com seu e-mail e senha institucionais.</li>
+              <li>Após autenticar, você será redirecionado ao Dashboard.</li>
+              <li>Em caso de erro, verifique suas credenciais com o suporte.</li>
+            </ul>
+          </HelpPanel>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

@@ -114,6 +114,13 @@ export function Consulta() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <HelpPanel pageKey="consulta">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Busque pelo aluno (nome, CPF ou matrícula) para filtrar a lista.</li>
+          <li>Baixe o PDF do calendário ou remova do histórico quando necessário.</li>
+          <li>Use Limpar para remover o filtro rapidamente.</li>
+        </ul>
+      </HelpPanel>
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Consultar PDFs</h1>

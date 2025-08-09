@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import HelpPanel from '@/components/HelpPanel';
 
 const NotFound = () => {
   const location = useLocation();
@@ -19,6 +20,14 @@ const NotFound = () => {
         <a href="/" className="text-blue-500 hover:text-blue-700 underline">
           Return to Home
         </a>
+        <div className="mt-6">
+          <HelpPanel pageKey="404">
+            <ul className="list-disc pl-5 space-y-1 text-left">
+              <li>A rota acessada não existe ou foi movida.</li>
+              <li>Use o link acima para voltar à página inicial.</li>
+            </ul>
+          </HelpPanel>
+        </div>
       </div>
     </div>
   );

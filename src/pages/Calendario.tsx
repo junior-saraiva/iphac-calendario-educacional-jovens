@@ -14,6 +14,7 @@ import { useTrilhas } from '@/hooks/useTrilhas';
 import { Aluno, CalendarioGerado } from '@/types';
 import { searchAlunosView, AlunoViewRow } from '@/integrations/supabase/queries/alunosView';
 import { logEvent } from '@/lib/logs';
+import HelpPanel from '@/components/HelpPanel';
 
 export function Calendario() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -148,6 +149,13 @@ export function Calendario() {
 
   return (
     <div className="space-y-6">
+      <HelpPanel pageKey="calendario">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Busque o aluno pela VIEW (nome, CPF ou matrícula) e selecione.</li>
+          <li>Informe a Data de Início do contrato e o Início das Férias.</li>
+          <li>Clique em Gerar Calendário para ver o preview e métricas do mês.</li>
+        </ul>
+      </HelpPanel>
       <div className="flex items-center space-x-4">
         <CalendarIcon className="h-8 w-8 text-primary" />
         <h1 className="text-3xl font-bold text-foreground">Gerar Calendário</h1>

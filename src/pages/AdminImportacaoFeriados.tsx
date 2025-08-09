@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import Papa from "papaparse";
+import HelpPanel from "@/components/HelpPanel";
 
 // Tipos auxiliares
 type Mode = "UNICO" | "FAIXA";
@@ -174,6 +175,15 @@ export default function AdminImportacaoFeriados() {
 
   return (
     <div className="space-y-6">
+      <HelpPanel pageKey="admin-importar-feriados">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Escolha Modo: Único (1 ano) ou Faixa (início–fim).</li>
+          <li>Defina Escopo: BR, UF ou Município; informe UF/IBGE quando aplicável.</li>
+          <li>Clique em Importar para o intervalo desejado (permitido 2025–2030).</li>
+          <li>Use Pré-carregar 2025–2030 para carregar rapidamente todos os anos.</li>
+          <li>Filtre a tabela por UF/IBGE; exporte a visualização atual em CSV.</li>
+        </ul>
+      </HelpPanel>
       <section className="space-y-4">
         <h1 className="text-xl font-semibold">Admin • Importar Feriados</h1>
         <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">

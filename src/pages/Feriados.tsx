@@ -151,6 +151,13 @@ export function Feriados() {
 
   return (
     <div className="space-y-6">
+      <HelpPanel pageKey="feriados">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Use Importar Feriados para carregar datas nacionais rapidamente.</li>
+          <li>Cadastre feriados locais (estadual/municipal/facultativo) em Novo Feriado.</li>
+          <li>Edite/Exclua itens na lista; evite duplicatas por data.</li>
+        </ul>
+      </HelpPanel>
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Gerenciar Feriados</h1>

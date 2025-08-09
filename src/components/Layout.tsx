@@ -14,10 +14,13 @@ import {
   Settings,
   ListTree
 } from 'lucide-react';
+import { Switch } from './ui/switch';
+import { useGlobalHelp } from '@/hooks/useHelp';
 
 export function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { globalEnabled, setGlobalEnabled } = useGlobalHelp();
 
   const handleLogout = () => {
     logout();
@@ -56,6 +59,10 @@ export function Layout() {
               <p className="text-xs text-muted-foreground">
                 {user?.perfil}
               </p>
+            </div>
+            <div className="hidden sm:flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Ajuda</span>
+              <Switch checked={globalEnabled} onCheckedChange={setGlobalEnabled} aria-label="Alternar ajuda" />
             </div>
             <Button variant="outline" size="sm" onClick={handleLogout} className="hover:bg-destructive hover:text-destructive-foreground transition-colors" aria-label="Sair">
               <LogOut className="h-4 w-4 mr-2" />

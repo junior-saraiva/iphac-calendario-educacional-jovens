@@ -16,6 +16,12 @@ export default function Logs() {
 
   return (
     <div className="space-y-6">
+      <HelpPanel pageKey="logs">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Consulte eventos recentes gerados pelo aplicativo.</li>
+          <li>Use o botão Limpar para reiniciar o histórico local.</li>
+        </ul>
+      </HelpPanel>
       <div className="flex items-center gap-3">
         <ListTree className="h-8 w-8 text-primary" />
         <h1 className="text-3xl font-bold text-foreground">Logs</h1>

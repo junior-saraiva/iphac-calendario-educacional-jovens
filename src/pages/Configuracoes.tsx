@@ -9,6 +9,7 @@ import { testViewConnection } from '@/integrations/supabase/queries/alunosView';
 import { logEvent } from '@/lib/logs';
 import { ServerCog, CheckCircle2, AlertTriangle, Database } from 'lucide-react';
 import ImportadorCSV from '@/components/ImportadorCSV';
+import HelpPanel from '@/components/HelpPanel';
 
 export default function Configuracoes() {
   const { toast } = useToast();
@@ -37,6 +38,13 @@ export default function Configuracoes() {
 
   return (
     <div className="space-y-6">
+      <HelpPanel pageKey="configuracoes">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Ajuste "Horas por encontro" e clique em Salvar.</li>
+          <li>Teste a conexão com a VIEW para validar integrações.</li>
+          <li>Use o importador CSV para carregar dados locais auxiliares.</li>
+        </ul>
+      </HelpPanel>
       <div className="flex items-center gap-3">
         <ServerCog className="h-8 w-8 text-primary" />
         <h1 className="text-3xl font-bold text-foreground">Configurações</h1>

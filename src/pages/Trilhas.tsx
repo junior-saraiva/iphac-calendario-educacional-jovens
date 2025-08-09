@@ -181,6 +181,13 @@ export function Trilhas() {
 
   return (
     <div className="space-y-6">
+      <HelpPanel pageKey="trilhas">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Crie uma trilha em Nova Trilha e defina tipo e turma.</li>
+          <li>Na aba Disciplinas, adicione carga horária e encontros por trilha.</li>
+          <li>Use o acordeão para gerenciar disciplinas e ações por item.</li>
+        </ul>
+      </HelpPanel>
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Trilhas & Disciplinas</h1>
