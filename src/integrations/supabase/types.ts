@@ -164,6 +164,39 @@ export type Database = {
         }
         Relationships: []
       }
+      municipio: {
+        Row: {
+          created_at: string
+          ibge_code: string
+          mesorregiao: string | null
+          microrregiao: string | null
+          nome: string
+          nome_uf: string | null
+          uf: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ibge_code: string
+          mesorregiao?: string | null
+          microrregiao?: string | null
+          nome: string
+          nome_uf?: string | null
+          uf: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ibge_code?: string
+          mesorregiao?: string | null
+          microrregiao?: string | null
+          nome?: string
+          nome_uf?: string | null
+          uf?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
