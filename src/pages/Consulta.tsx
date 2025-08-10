@@ -10,6 +10,7 @@ import { CalendarioGerado } from '@/types';
 import { Search, FileText, Download, Calendar, Users, Filter, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import HelpPanel from '@/components/HelpPanel';
 
 export function Consulta() {
   const { toast } = useToast();

@@ -14,6 +14,7 @@ import { useTrilhas } from '@/hooks/useTrilhas';
 import { Trilha, Disciplina } from '@/types';
 import { mockTurmas } from '@/data/mockData';
 import { BookOpen, Plus, Edit, Trash2, Clock, GraduationCap, Users } from 'lucide-react';
+import HelpPanel from '@/components/HelpPanel';
 
 export function Trilhas() {
   const { toast } = useToast();

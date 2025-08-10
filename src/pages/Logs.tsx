@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getLogs, clearLogs } from '@/lib/logs';
 import { Trash2, ListTree } from 'lucide-react';
+import HelpPanel from '@/components/HelpPanel';
 
 export default function Logs() {
   const [tick, setTick] = useState(0);
