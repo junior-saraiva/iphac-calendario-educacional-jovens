@@ -241,6 +241,23 @@ export function Calendario() {
                     onChange={(e) => setDataInicio(e.target.value)}
                   />
                 </div>
+
+                {/* Mês das Férias (auto preenche feriasInicio) */}
+                <div className="space-y-2">
+                  <Label>Mês das Férias</Label>
+                  <Select value={mesFerias} onValueChange={(v) => setMesFerias(v as any)}>
+                    <SelectTrigger aria-label="Mês das Férias">
+                      <SelectValue placeholder="Selecione (Jan/Jul/Dez)" />
+                    </SelectTrigger>
+                    <SelectContent className="z-50">
+                      <SelectItem value="janeiro">Janeiro</SelectItem>
+                      <SelectItem value="julho">Julho</SelectItem>
+                      <SelectItem value="dezembro">Dezembro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="text-xs text-muted-foreground">Ajusta o início das férias para o dia 01 do mês escolhido.</div>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="feriasInicio">Início das Férias</Label>
                   <Input
@@ -250,20 +267,39 @@ export function Calendario() {
                     onChange={(e) => setFeriasInicio(e.target.value)}
                   />
                 </div>
+
+                {/* Dia da Aula Teórica */}
+                <div className="space-y-2">
+                  <Label>Dia da Aula Teórica</Label>
+                  <Select value={diaSemana} onValueChange={(v) => setDiaSemana(v as any)}>
+                    <SelectTrigger aria-label="Dia da Aula Teórica">
+                      <SelectValue placeholder="Escolha (Segunda a Sexta)" />
+                    </SelectTrigger>
+                    <SelectContent className="z-50">
+                      <SelectItem value="Segunda">Segunda</SelectItem>
+                      <SelectItem value="Terça">Terça</SelectItem>
+                      <SelectItem value="Quarta">Quarta</SelectItem>
+                      <SelectItem value="Quinta">Quinta</SelectItem>
+                      <SelectItem value="Sexta">Sexta</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {dataInicio && (
                   <div className="p-3 bg-accent/20 rounded-md border">
                     <div className="text-sm font-medium text-muted-foreground mb-1">Duração do Contrato:</div>
                     <div className="text-sm">
-                      <strong>Data Final:</strong> {new Date(new Date(dataInicio).setMonth(new Date(dataInicio).getMonth() + 24)).toLocaleDateString('pt-BR')}
+                      <strong>Data Final (calculada):</strong> {dataFimCalculada ? dataFimCalculada.toLocaleDateString('pt-BR') : '—'}
                     </div>
                     {contratoFim && (
                       <div className="text-sm">
                         <strong>Data Final (VIEW):</strong> {new Date(contratoFim).toLocaleDateString('pt-BR')}
                       </div>
                     )}
-                    <div className="text-sm text-muted-foreground">
-                      24 meses (máximo legal)
-                    </div>
+                    {fimDivergente && (
+                      <div className="text-sm text-destructive font-medium">Atenção: A data calculada diverge da data da base.</div>
+                    )}
+                    <div className="text-sm text-muted-foreground">23 meses (regra do projeto)</div>
                   </div>
                 )}
               </div>
@@ -305,7 +341,7 @@ export function Calendario() {
                           <div><strong>Curso:</strong> {selectedAluno.curso}</div>
                           <div><strong>Turno:</strong> {selectedAluno.turno}</div>
                           <div><strong>Turma:</strong> {getTurmaNome(selectedAluno.turma_id)}</div>
-                          <div><strong>Dia da Aula:</strong> {selectedAluno.dia_aula_semana}</div>
+                          <div><strong>Dia da Aula:</strong> {diaSemana || selectedAluno.dia_aula_semana}</div>
                         </div>
                         <div className="space-y-1">
                           <div className="font-medium text-muted-foreground">Vinculações</div>
