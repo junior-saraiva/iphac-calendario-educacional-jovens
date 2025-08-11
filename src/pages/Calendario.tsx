@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CalendarioVisualizer } from '@/components/CalendarioVisualizer';
 import { CalendarioGenerator } from '@/lib/calendarioGenerator';
 import { Search, Calendar as CalendarIcon, Users } from 'lucide-react';
+import { addMonths } from 'date-fns';
 
 import { useToast } from '@/hooks/use-toast';
 import { useFeriadosMultiAno } from '@/hooks/useFeriadosMultiAno';
@@ -29,6 +30,7 @@ export function Calendario() {
   const [contratoFim, setContratoFim] = useState<string | null>(null);
   const [turno, setTurno] = useState<'Manhã' | 'Tarde' | 'Noite' | ''>('');
   const [diaSemana, setDiaSemana] = useState<'Segunda' | 'Terça' | 'Quarta' | 'Quinta' | 'Sexta' | ''>('');
+  const [mesFerias, setMesFerias] = useState<'janeiro' | 'julho' | 'dezembro' | ''>('');
   const { toast } = useToast();
   const { feriados } = useFeriadosMultiAno();
   const { trilhas } = useTrilhas();
@@ -39,6 +41,20 @@ export function Calendario() {
     CalendarioGenerator.setTrilhas(trilhas);
   }, [feriados, trilhas]);
 
+  // Ajustar feriasInicio automaticamente quando escolher mês de férias
+  useEffect(() => {
+    if (!dataInicio || !mesFerias) return;
+    const inicio = new Date(dataInicio);
+    const monthMap: Record<string, number> = { janeiro: 0, julho: 6, dezembro: 11 };
+    const targetMonth = monthMap[mesFerias];
+    let year = inicio.getFullYear();
+    if (targetMonth < inicio.getMonth()) {
+      year += 1;
+    }
+    const mm = String(targetMonth + 1).padStart(2, '0');
+    const dia = '01';
+    setFeriasInicio(`${year}-${mm}-${dia}`);
+  }, [dataInicio, mesFerias]);
 
   // Busca na VIEW por RA/CPF/Nome
   useEffect(() => {
@@ -99,9 +115,8 @@ export function Calendario() {
       const dataInicioDate = new Date(dataInicio);
       const feriasInicioDate = new Date(feriasInicio);
       
-      // Calcular data fim automaticamente (24 meses a partir da data de início)
-      const dataFim = new Date(dataInicioDate);
-      dataFim.setMonth(dataFim.getMonth() + 24);
+      // Calcular data fim automaticamente (23 meses a partir da data de início)
+      const dataFim = addMonths(dataInicioDate, 23);
 
       CalendarioGenerator.setFeriados(feriados);
       CalendarioGenerator.setTrilhas(trilhas);
@@ -146,6 +161,13 @@ export function Calendario() {
   const getTurmaNome = (turmaId: string) => turmaId || '—';
 
   const getPoloNome = (poloId: string) => poloId || '—';
+
+  // Cálculo de datas de término e divergência com o BD
+  const dataInicioDateObj = dataInicio ? new Date(dataInicio) : null;
+  const dataFimCalculada = dataInicioDateObj ? addMonths(dataInicioDateObj, 23) : null;
+  const dataFimCalculadaISO = dataFimCalculada ? dataFimCalculada.toISOString().slice(0, 10) : null;
+  const contratoFimISO = contratoFim ? new Date(contratoFim).toISOString().slice(0, 10) : null;
+  const fimDivergente = !!(dataFimCalculadaISO && contratoFimISO && dataFimCalculadaISO !== contratoFimISO);
 
   return (
     <div className="space-y-6">
