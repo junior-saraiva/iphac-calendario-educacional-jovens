@@ -24,9 +24,9 @@ export class ValidadorCalendario {
       erros.push('Duração do contrato deve ser de pelo menos 6 meses');
     }
 
-    // Validar duração máxima do contrato (máximo 24 meses)
-    if (duracaoMeses > 24.5) { // Tolerância de meio mês para variações de dias
-      erros.push('Duração do contrato não pode exceder 24 meses');
+    // Validar duração máxima do contrato (máximo 23 meses conforme regra do projeto)
+    if (duracaoMeses > 23.5) { // Tolerância de meio mês para variações de dias
+      erros.push('Duração do contrato não pode exceder 23 meses');
     }
 
     // Validar se férias estão dentro do período do contrato
