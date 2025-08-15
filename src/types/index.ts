@@ -91,7 +91,10 @@ export interface CalendarioGerado {
   eventos: CalendarioEvento[];
   data_inicio: string;
   data_fim: string;
-  ferias_inicio: string;
-  ferias_fim: string;
+  ferias_modo: '30' | '15+15';
+  ferias_inicio_1: string;
+  ferias_fim_1: string;
+  ferias_inicio_2?: string;
+  ferias_fim_2?: string;
   resumo_trilhas: ResumoTrilha[];
 }

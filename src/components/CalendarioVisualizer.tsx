@@ -133,6 +133,39 @@ export function CalendarioVisualizer({ calendario }: CalendarioVisualizerProps) 
         </CardContent>
       </Card>
 
+      {/* Informações das Férias */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Informações das Férias</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <div className="text-sm font-medium">Modo das Férias</div>
+              <div className="text-sm text-muted-foreground">
+                {calendario.ferias_modo === '30' ? '30 dias corridos' : '15 + 15 dias (dois blocos)'}
+              </div>
+            </div>
+            <div>
+              <div className="text-sm font-medium">1º Período</div>
+              <div className="text-sm text-muted-foreground">
+                {format(new Date(calendario.ferias_inicio_1), 'dd/MM/yyyy', { locale: ptBR })} até{' '}
+                {format(new Date(calendario.ferias_fim_1), 'dd/MM/yyyy', { locale: ptBR })}
+              </div>
+            </div>
+            {calendario.ferias_modo === '15+15' && calendario.ferias_inicio_2 && (
+              <div>
+                <div className="text-sm font-medium">2º Período</div>
+                <div className="text-sm text-muted-foreground">
+                  {format(new Date(calendario.ferias_inicio_2), 'dd/MM/yyyy', { locale: ptBR })} até{' '}
+                  {format(new Date(calendario.ferias_fim_2!), 'dd/MM/yyyy', { locale: ptBR })}
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Grid do Calendário */}
       <Card>
         <CardContent className="p-6">

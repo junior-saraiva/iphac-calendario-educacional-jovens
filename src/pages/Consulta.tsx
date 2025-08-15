@@ -224,10 +224,18 @@ export function Consulta() {
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          <div>{formatarData(calendario.ferias_inicio)}</div>
+                          <div>{formatarData(calendario.ferias_inicio_1)}</div>
                           <div className="text-muted-foreground">
-                            até {formatarData(calendario.ferias_fim)}
+                            até {formatarData(calendario.ferias_fim_1)}
                           </div>
+                          {calendario.ferias_modo === '15+15' && calendario.ferias_inicio_2 && (
+                            <>
+                              <div className="mt-1">{formatarData(calendario.ferias_inicio_2)}</div>
+                              <div className="text-muted-foreground">
+                                até {formatarData(calendario.ferias_fim_2!)}
+                              </div>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>

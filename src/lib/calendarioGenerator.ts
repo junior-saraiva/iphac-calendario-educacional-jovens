@@ -55,7 +55,9 @@ export class CalendarioGenerator {
     aluno: Aluno,
     dataInicio: Date,
     dataFim: Date,
-    feriasInicio: Date
+    feriasModo: '30' | '15+15',
+    feriasInicio1: Date,
+    feriasInicio2?: Date
   ): CalendarioGerado {
     console.log(`[CALENDARIO] Iniciando geração para ${aluno.nome}`);
     
@@ -63,7 +65,9 @@ export class CalendarioGenerator {
     const validacao = ValidadorCalendario.validarTodasAsRegras(
       dataInicio,
       dataFim,
-      feriasInicio,
+      feriasModo,
+      feriasInicio1,
+      feriasInicio2,
       aluno.dia_aula_semana
     );
 
@@ -96,7 +100,7 @@ export class CalendarioGenerator {
     console.log(`[CALENDARIO] Data ajustada: ${format(dataInicioAjustada, 'yyyy-MM-dd')}`);
     
     // Gerar eventos de férias
-    const eventosFerias = this.gerarFerias(feriasInicio);
+    const eventosFerias = this.gerarFerias(feriasModo, feriasInicio1, feriasInicio2);
     console.log(`[CALENDARIO] Gerados ${eventosFerias.length} eventos de férias`);
 
     // Obter disciplinas da turma do aluno
@@ -168,8 +172,11 @@ export class CalendarioGenerator {
       eventos: todosEventos,
       data_inicio: format(dataInicioAjustada, 'yyyy-MM-dd'),
       data_fim: format(dataFim, 'yyyy-MM-dd'),
-      ferias_inicio: format(feriasInicio, 'yyyy-MM-dd'),
-      ferias_fim: format(addDays(feriasInicio, 29), 'yyyy-MM-dd'),
+      ferias_modo: feriasModo,
+      ferias_inicio_1: format(feriasInicio1, 'yyyy-MM-dd'),
+      ferias_fim_1: format(addDays(feriasInicio1, feriasModo === '30' ? 29 : 14), 'yyyy-MM-dd'),
+      ferias_inicio_2: feriasInicio2 ? format(feriasInicio2, 'yyyy-MM-dd') : undefined,
+      ferias_fim_2: feriasInicio2 ? format(addDays(feriasInicio2, 14), 'yyyy-MM-dd') : undefined,
       resumo_trilhas: resumoTrilhas
     };
 
@@ -178,18 +185,36 @@ export class CalendarioGenerator {
   }
 
   /**
-   * Gera eventos de férias
+   * Gera eventos de férias baseado no modo escolhido
    */
-  private static gerarFerias(feriasInicio: Date): CalendarioEvento[] {
+  private static gerarFerias(
+    feriasModo: '30' | '15+15',
+    feriasInicio1: Date,
+    feriasInicio2?: Date
+  ): CalendarioEvento[] {
     const eventos: CalendarioEvento[] = [];
     
-    for (let i = 0; i < 30; i++) {
-      const dataFerias = addDays(feriasInicio, i);
+    // Primeiro bloco de férias
+    const diasPrimeiroBloco = feriasModo === '30' ? 30 : 15;
+    for (let i = 0; i < diasPrimeiroBloco; i++) {
+      const dataFerias = addDays(feriasInicio1, i);
       eventos.push({
         data: format(dataFerias, 'yyyy-MM-dd'),
         tipo: 'ferias',
-        descricao: 'Férias'
+        descricao: feriasModo === '30' ? 'Férias (30 dias)' : 'Férias (1º bloco - 15 dias)'
       });
+    }
+    
+    // Segundo bloco de férias (apenas se modo 15+15)
+    if (feriasModo === '15+15' && feriasInicio2) {
+      for (let i = 0; i < 15; i++) {
+        const dataFerias = addDays(feriasInicio2, i);
+        eventos.push({
+          data: format(dataFerias, 'yyyy-MM-dd'),
+          tipo: 'ferias',
+          descricao: 'Férias (2º bloco - 15 dias)'
+        });
+      }
     }
     
     return eventos;

@@ -22,6 +22,8 @@ export function Calendario() {
   const [selectedAluno, setSelectedAluno] = useState<Aluno | null>(null);
   const [dataInicio, setDataInicio] = useState('');
   const [feriasInicio, setFeriasInicio] = useState('');
+  const [feriasInicio2, setFeriasInicio2] = useState('');
+  const [feriasModo, setFeriasModo] = useState<'30' | '15+15'>('30');
   const [calendarioGerado, setCalendarioGerado] = useState<CalendarioGerado | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [sbResults, setSbResults] = useState<AlunoViewRow[]>([]);
@@ -30,7 +32,7 @@ export function Calendario() {
   const [contratoFim, setContratoFim] = useState<string | null>(null);
   const [turno, setTurno] = useState<'Manhã' | 'Tarde' | 'Noite' | ''>('');
   const [diaSemana, setDiaSemana] = useState<'Segunda' | 'Terça' | 'Quarta' | 'Quinta' | 'Sexta' | ''>('');
-  const [mesFerias, setMesFerias] = useState<'janeiro' | 'julho' | 'dezembro' | ''>('');
+  const [mesFerias, setMesFerias] = useState<'janeiro' | 'junho' | 'julho' | 'dezembro' | ''>('');
   const { toast } = useToast();
   const { feriados } = useFeriadosMultiAno();
   const { trilhas } = useTrilhas();
@@ -45,7 +47,12 @@ export function Calendario() {
   useEffect(() => {
     if (!dataInicio || !mesFerias) return;
     const inicio = new Date(dataInicio);
-    const monthMap: Record<string, number> = { janeiro: 0, julho: 6, dezembro: 11 };
+    const monthMap: Record<string, number> = { 
+      janeiro: 0, 
+      junho: 5, 
+      julho: 6, 
+      dezembro: 11 
+    };
     const targetMonth = monthMap[mesFerias];
     let year = inicio.getFullYear();
     if (targetMonth < inicio.getMonth()) {
@@ -101,11 +108,14 @@ export function Calendario() {
   };
 
   const handleGerarCalendario = async () => {
-    if (!selectedAluno || !dataInicio || !feriasInicio) {
+    const feriasInicio1Required = !feriasInicio;
+    const feriasInicio2Required = feriasModo === '15+15' && !feriasInicio2;
+    
+    if (!selectedAluno || !dataInicio || feriasInicio1Required || feriasInicio2Required) {
       toast({
         variant: "destructive",
         title: "Dados incompletos",
-        description: "Por favor, selecione um aluno e preencha todas as datas."
+        description: "Preencha todos os campos obrigatórios antes de gerar o calendário."
       });
       return;
     }
@@ -113,7 +123,8 @@ export function Calendario() {
     setIsGenerating(true);
     try {
       const dataInicioDate = new Date(dataInicio);
-      const feriasInicioDate = new Date(feriasInicio);
+      const feriasInicioDate1 = new Date(feriasInicio);
+      const feriasInicioDate2 = feriasInicio2 ? new Date(feriasInicio2) : undefined;
       
       // Calcular data fim automaticamente (23 meses a partir da data de início)
       const dataFim = addMonths(dataInicioDate, 23);
@@ -127,7 +138,9 @@ export function Calendario() {
         alunoParaGerar,
         dataInicioDate,
         dataFim,
-        feriasInicioDate
+        feriasModo,
+        feriasInicioDate1,
+        feriasInicioDate2
       );
 
       setCalendarioGerado(calendario);
@@ -242,31 +255,73 @@ export function Calendario() {
                   />
                 </div>
 
-                {/* Mês das Férias (auto preenche feriasInicio) */}
+                {/* Modo de Férias */}
                 <div className="space-y-2">
-                  <Label>Mês das Férias</Label>
-                  <Select value={mesFerias} onValueChange={(v) => setMesFerias(v as any)}>
-                    <SelectTrigger aria-label="Mês das Férias">
-                      <SelectValue placeholder="Selecione (Jan/Jul/Dez)" />
+                  <Label>Modo de Férias</Label>
+                  <Select value={feriasModo} onValueChange={(v) => setFeriasModo(v as '30' | '15+15')}>
+                    <SelectTrigger aria-label="Modo de Férias">
+                      <SelectValue placeholder="Escolha o modo" />
                     </SelectTrigger>
                     <SelectContent className="z-50">
-                      <SelectItem value="janeiro">Janeiro</SelectItem>
-                      <SelectItem value="julho">Julho</SelectItem>
-                      <SelectItem value="dezembro">Dezembro</SelectItem>
+                      <SelectItem value="30">30 dias corridos</SelectItem>
+                      <SelectItem value="15+15">15 + 15 dias (dois blocos)</SelectItem>
                     </SelectContent>
                   </Select>
-                  <div className="text-xs text-muted-foreground">Ajusta o início das férias para o dia 01 do mês escolhido.</div>
+                </div>
+
+                {/* Mês das Férias (auto preenche feriasInicio) */}
+                <div className="space-y-2">
+                  <Label>Mês das Férias (1º período)</Label>
+                  <Select 
+                    value={mesFerias} 
+                    onValueChange={(v) => setMesFerias(v as any)}
+                    disabled={!dataInicio}
+                  >
+                    <SelectTrigger aria-label="Mês das Férias">
+                      <SelectValue placeholder="Selecione (Dez/Jan/Jun/Jul)" />
+                    </SelectTrigger>
+                    <SelectContent className="z-50">
+                      <SelectItem value="dezembro">Dezembro</SelectItem>
+                      <SelectItem value="janeiro">Janeiro</SelectItem>
+                      <SelectItem value="junho">Junho</SelectItem>
+                      <SelectItem value="julho">Julho</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="text-xs text-muted-foreground">
+                    Apenas meses permitidos: Dezembro, Janeiro, Junho e Julho.
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="feriasInicio">Início das Férias</Label>
+                  <Label htmlFor="feriasInicio">
+                    Início das Férias {feriasModo === '15+15' ? '(1º bloco)' : ''}
+                  </Label>
                   <Input
                     id="feriasInicio"
                     type="date"
                     value={feriasInicio}
                     onChange={(e) => setFeriasInicio(e.target.value)}
                   />
+                  <div className="text-xs text-muted-foreground">
+                    {feriasModo === '30' ? '30 dias corridos a partir desta data' : '15 dias a partir desta data'}
+                  </div>
                 </div>
+
+                {/* Segunda data de férias (apenas se modo 15+15) */}
+                {feriasModo === '15+15' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="feriasInicio2">Início das Férias (2º bloco)</Label>
+                    <Input
+                      id="feriasInicio2"
+                      type="date"
+                      value={feriasInicio2}
+                      onChange={(e) => setFeriasInicio2(e.target.value)}
+                    />
+                    <div className="text-xs text-muted-foreground">
+                      15 dias a partir desta data. Deve ser em Dez/Jan/Jun/Jul.
+                    </div>
+                  </div>
+                )}
 
                 {/* Dia da Aula Teórica */}
                 <div className="space-y-2">
@@ -306,7 +361,7 @@ export function Calendario() {
 
               <Button
                 onClick={handleGerarCalendario}
-                disabled={!selectedAluno || !dataInicio || !feriasInicio || isGenerating}
+                disabled={!selectedAluno || !dataInicio || !feriasInicio || (feriasModo === '15+15' && !feriasInicio2) || isGenerating}
                 className="w-full"
               >
                 {isGenerating ? (
